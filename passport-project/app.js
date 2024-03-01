@@ -24,7 +24,7 @@ app.use(session({
 // Mount authentication routes
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/auth', authRoutes);
+app.use('/auth', authRoutes); // make sure the above two lines are set up before this
 
 const isAuthenticated = (req, res, next) => {
   // Passport adds 'req.user' property if user is authenticated
