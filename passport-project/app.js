@@ -22,9 +22,9 @@ app.use(session({
 }));
 
 // Mount authentication routes
-app.use('/auth', authRoutes);
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/auth', authRoutes);
 
 const isAuthenticated = (req, res, next) => {
   // Passport adds 'req.user' property if user is authenticated
@@ -72,16 +72,6 @@ app.get('/admin', isAuthenticated, hasPermission('admin'), (req, res) => {
   res.send('Welcome to the admin dashboard!');
 });
 
-app.get('/logout', (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      console.error('Error logging out:', err);
-      // Handle error
-      return res.status(500).send('Internal Server Error');
-    }
-  })
-  res.redirect('/logoutConfirmed');
-});
 
 // Start the server
 const PORT = process.env.PORT || 3000;

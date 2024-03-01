@@ -24,6 +24,17 @@ router.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
+router.get('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error('Error logging out:', err);
+      // Handle error
+      return res.status(500).send('Internal Server Error');
+    }
+  })
+  res.redirect('/logoutConfirmed');
+});
+
 // router.post('/register'...)
 router.post('/register', async (req, res) => {
     const { email, password, role } = req.body;
