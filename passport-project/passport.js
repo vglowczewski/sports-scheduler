@@ -17,24 +17,20 @@ passport.use(new LocalStrategy(
 
       // Fetch the role from the user document
       const role = user.role;
-      console.log(role)
       return done(null, user);
     } catch (error) {
-      console.log('by')
       return done(error);
     }
   }
 ));
 
 passport.serializeUser((user, done) => {
-  console.log(2)
   done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
-    console.log(user)
     done(null, user);
   } catch (error) {
     done(error);

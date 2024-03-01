@@ -1,7 +1,6 @@
 // Import required modules
 const express = require('express');
 const session = require('express-session');
-const flash = require('connect-flash');
 const passport = require('passport'); // Import the configured Passport instance
 require('./passport');
 require('./db'); // Import Mongoose configuration
@@ -26,7 +25,6 @@ app.use(session({
 app.use('/auth', authRoutes);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
 
 const isAuthenticated = (req, res, next) => {
   // Passport adds 'req.user' property if user is authenticated
@@ -41,7 +39,6 @@ const isAuthenticated = (req, res, next) => {
 // Middleware function to check if user has specific role/permission
 const hasPermission = (requiredRole) => {
   return (req, res, next) => {
-    console.log(req.user.role)
     // Check if user has the required role/permission
     if (req.user && req.user.role === requiredRole) {
       // User has the required role/permission, proceed to the next middleware
@@ -65,6 +62,10 @@ app.get('/dashboard', (req, res) => {
   res.send('Welcome to the dashboard!');
 });
 
+app.get('/logoutConfirmed', (req, res) => {
+  res.send('You have logged out!');
+});
+
 // Example route that requires authentication and specific role
 app.get('/admin', isAuthenticated, hasPermission('admin'), (req, res) => {
   // Route handler for admin route
@@ -79,7 +80,7 @@ app.get('/logout', (req, res) => {
       return res.status(500).send('Internal Server Error');
     }
   })
-  res.redirect('/dashboard');
+  res.redirect('/logoutConfirmed');
 });
 
 // Start the server

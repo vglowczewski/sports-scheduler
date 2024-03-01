@@ -4,8 +4,6 @@ const passport = require('passport');
 const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const flash = require('connect-flash');
-
 
 
 // POST request to handle login form submission
@@ -15,8 +13,7 @@ router.post('/login', (req, res, next) => {
       console.log(err)
     }
     if (!user) {
-      req.flash('error', 'Invalid email or password.'); // Flash error message
-     // return res.redirect('/login'); // Redirect to login page
+      return res.redirect('/login'); // Redirect to login page
     }
     req.logIn(user, (err) => {
       if (err) {

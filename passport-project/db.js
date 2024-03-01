@@ -5,7 +5,7 @@ const mongoURI = 'mongodb+srv://admin:PHoN7bysJOS1qHKc@cluster0.uovspcw.mongodb.
 
   const connectToMongoDB = async (uri) => {
     try {
-      await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+      await mongoose.connect(uri);
       console.log('Connected to MongoDB Atlas');
     } catch (err) {
       console.error('Error connecting to MongoDB Atlas:', err);
