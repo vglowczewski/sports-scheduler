@@ -10,13 +10,11 @@ passport.use(new LocalStrategy(
     try {
       console.log('Authenticating user:', email); // Log the email being authenticated
       const user = await User.findOne({ email });
-
+      
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return done(null, false, { message: 'Incorrect email or password.' });
       }
 
-      // Fetch the role from the user document
-      const role = user.role;
       return done(null, user);
     } catch (error) {
       return done(error);

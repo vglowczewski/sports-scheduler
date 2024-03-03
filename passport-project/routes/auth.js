@@ -59,7 +59,6 @@ router.post('/register', async (req, res) => {
   
       // Save the new user to the database
       await newUser.save();
-  
       return res.status(201).json({ message: 'User created successfully.' });
     } catch (error) {
       console.error('Error registering user:', error);

@@ -6,7 +6,11 @@ require('./passport');
 require('./db'); // Import Mongoose configuration
 const bcrypt = require('bcryptjs');
 const User = require('./models/User'); // Assuming User model is defined in a separate file
+const Event = require('./models/Event');
+const League = require('./models/League');
+const Team = require('./models/Team');
 const authRoutes = require('./routes/auth');
+const eventsRoutes = require('./routes/events');
 const generateSalt = require('./saltGenerator');
 
 // Initialize Express app
@@ -25,6 +29,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authRoutes); // make sure the above two lines are set up before this
+
+app.use('/events', eventsRoutes);
 
 const isAuthenticated = (req, res, next) => {
   // Passport adds 'req.user' property if user is authenticated
