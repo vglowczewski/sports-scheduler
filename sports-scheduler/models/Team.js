@@ -3,9 +3,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const teamSchema = new Schema({
-  _id: { type: Schema.Types.ObjectId },
   school: { type: String, required: true },
-  league: { type: Schema.Types.ObjectId, ref: 'League'}
+  league: { type: Schema.Types.ObjectId, ref: 'League'} //might not need
 });
 
 module.exports = mongoose.model('Team', teamSchema);

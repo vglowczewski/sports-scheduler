@@ -5,12 +5,33 @@ const Event = require('../models/Event');
 
 // GET all events
 router.get('/', async (req, res) => {
-    const events = await Event.find({});
-    console.log(events);
-    res.json(events);
+    try {
+        let events;
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
+        console.log(req.query);
+        if(startDate && endDate) {
+            events = await Event.find({
+                startDate: {
+                    $gte: new Date(startDate)
+                },
+                endDate: {
+                    $lte: new Date(endDate)
+                }
+            })
+        }
+        else {
+            events = await Event.find({});
+        }
+        console.log(events);
+        res.json(events);
+    } catch (error){
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
 });
 
-//Get a specific event by id
+//GET a specific event by id
 router.get('/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
@@ -24,12 +45,12 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-//Create a new event
+// Create a new event
 router.post('/', async (req, res) => {
     try {
         const event = new Event(req.body);
         await event.save();
-        res.status(201).json({ message: 'User created successfully.' }, event);
+        res.status(201).json({ message: 'Event created successfully.' }); //had to take out ",event"
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
@@ -45,6 +66,21 @@ router.delete('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Event not found' });
         }
         res.json({ message: 'Event deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// Update an event
+router.put('/:eventId', async (req, res) => {
+    const eventId = req.params.eventId;
+    try {
+        const updatedEvent = await Event.findByIdAndUpdate(eventId, req.body, { new: true });
+        if (!updatedEvent) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+        res.json({ message: 'Event updated successfully', event: updatedEvent });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
