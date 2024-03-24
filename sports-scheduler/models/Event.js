@@ -22,7 +22,7 @@ const eventSchema = new Schema({
     type: String 
   }],
   league: { 
-    type: String, 
+    type: Schema.Types.ObjectId, 
     required: true,
     ref: 'League' },
   notes: { 
