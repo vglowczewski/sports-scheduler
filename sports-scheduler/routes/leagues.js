@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const League = require('../models/League');
+const Event = require('../models/Event');
 
 // GET all leagues
 router.get('/', async (req, res) => {
@@ -40,6 +41,7 @@ router.get('/:leagueid/events', async (req, res) => {
         let events;
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
+        console.log(req.query)
 
         if (startDate && endDate) {
             events = await Event.find({
@@ -50,9 +52,10 @@ router.get('/:leagueid/events', async (req, res) => {
                 endDate: {
                     $lte: new Date(endDate)
                 }
-            }).sort({ startDate: 'asc' }); // Sort by start date in ascending order
+            })
         } else {
-            events = await Event.find({ league: leagueId }).sort({ startDate: 'asc' });
+            events = await Event.find({ league: leagueId });
+            console.log(events)
         }
         
         console.log(events);
