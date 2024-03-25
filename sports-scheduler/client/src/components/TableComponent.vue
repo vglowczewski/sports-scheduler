@@ -7,8 +7,8 @@
             <th>Start Date</th>
             <th>End Date</th>
             <th>Location</th>
-            <!-- <th>Teams</th>
-            <th>League</th> -->
+            <th>Teams</th>
+            <th>League</th>
             <th>Notes</th>
           </tr>
         </thead>
@@ -18,8 +18,8 @@
             <td>{{ formatDate(event.startDate) }}</td>
             <td>{{ formatDate(event.endDate) }}</td>
             <td>{{ event.location }}</td>
-            <!-- <td>{{ event.teams.join(', ') }}</td> -->
-            <!-- <td>{{ event.league }}</td> -->
+            <td>{{ event.teams.join(', ') }}</td>
+            <td>{{ event.league }}</td>
             <td>{{ event.notes }}</td>
           </tr>
         </tbody>

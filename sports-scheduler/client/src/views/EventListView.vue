@@ -7,11 +7,12 @@ import EventService from '@/services/EventService.js'
 const events = ref([]);
 
 onMounted(async () => {
+  console.log("fetching events")
   // Fetch events data from eventservice
   try {
     const eventData = await EventService.getEvents();
-    events.value = eventData;
-    console.log(eventData)
+    events.value = eventData; //issue here
+    console.log("events fetched")
   } catch (error) {
     console.error("Failed to fetch events:", error);
   }
@@ -21,6 +22,7 @@ onMounted(async () => {
 <template>
   <div>
     <h1>Events List</h1>
+    <Table :events="events"/>
   </div>
 </template>
  

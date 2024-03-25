@@ -10,8 +10,14 @@ const apiClient = axios.create({
   })
    
   export default {
-    getEvents() {
-      return apiClient.get('/events/')
-    }
+    async getEvents() {
+      try {
+        const response = await apiClient.get('/events/');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        throw error; // Re-throw the error to propagate it to the caller
+      }
+    } 
   }
   
