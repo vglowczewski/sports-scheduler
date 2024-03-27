@@ -21,7 +21,7 @@
             <td>{{ formatTime(event.startDate) }}</td>
             <td>{{ formatTime(event.endDate) }}</td>
             <td>{{ event.location }}</td>
-            <td>{{ event.opponent.name }}</td>
+            <td>{{ event.opponent ? event.opponent.name : ' ' }}</td>
             <td>{{ event.notes }}</td>
           </tr>
         </tbody>
@@ -47,13 +47,6 @@
       return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); //fix the time
   }
 
-  // Method to get opponent team name
-  function getOpponent(event) {
-    const userTeam = 'BVG'; // Replace this with your actual school's team name
-    const opponentTeam = event.teams.find(team => team !== userTeam); // Find opponent team
-
-    return opponentTeam ? opponentTeam : ''; // Return opponent team name or default message
-  }
   </script>
   
   <style scoped>
