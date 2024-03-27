@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/User'); // Assuming User model is defined in a separate file
 const Event = require('./models/Event');
 const League = require('./models/League');
+const Team = require('./models/Team');
 // const Team = require('./models/Team');
 const authRoutes = require('./routes/auth');
 const eventsRoutes = require('./routes/events');
