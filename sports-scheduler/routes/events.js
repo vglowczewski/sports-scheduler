@@ -18,10 +18,10 @@ router.get('/', async (req, res) => {
                 endDate: {
                     $lte: new Date(endDate)
                 }
-            })
+            }).populate('league');
         }
         else {
-            events = await Event.find({});
+            events = await Event.find({}).populate('league'); //populate league field
         }
         console.log(events);
         res.json(events);
