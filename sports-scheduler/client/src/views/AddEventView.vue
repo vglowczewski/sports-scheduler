@@ -14,12 +14,15 @@
         <input type="datetime-local" id="endDate"  v-model="formData.endDate" required>
         <label for="location">Location</label>
         <input type="text" id="location"  v-model="formData.location" required>
-        <label for="opponent">Opponent</label>
-        <input type="text" id="opponent"  v-model="formData.opponent">
         <label for="league">League</label>
-        <select id="league" v-model="formData.league" required>
+        <select id="league" v-model="formData.league" @change="fetchOpponents" required>
             <option value="">Select a League</option>
-            <option v-for="league in leagues" :key="league.id" :value="league.id">{{ league.name }}</option>
+            <option v-for="league in leagues" :key="league._id" :value="league._id">{{ league.name }}</option>
+        </select>
+        <label for="opponent">Opponent</label>
+        <select id="opponent" v-model="formData.opponent" required>
+            <option value="">Select an Opponent</option>
+            <option v-for="opponent in filteredOpponents" :key="opponent._id" :value="opponent._id">{{ opponent.name }}</option>
         </select>
         <label for="notes">Notes</label>
         <input type="text" id="notes"  v-model="formData.notes">
@@ -30,56 +33,95 @@
   
   <script>
   import axios from 'axios';
-  import { ref, onMounted } from 'vue';
-  import LeagueService from '@/services/LeagueService.js'
+  import { ref, onMounted, computed } from 'vue';
+  import LeagueService from '@/services/LeagueService.js';
+  import TeamService from '@/services/TeamService.js';
 
-    //leagues variable starts empty
-    const leagues = ref([]);
 
-    onMounted(async () => {
-    console.log("fetching leagues")
-    // Fetch league data
-    try {
-        const leagueData = await LeagueService.getLeagues();
-        leagues.value = leagueData; //issue here
-        console.log("leagues fetched")
-        console.log(leagues);
-    } catch (error) {
-        console.error("Failed to fetch leagues:", error);
-    }
-    });
+ 
     
   export default {
-    data() {
-      return {
-        formData: {
-          type: '',
-          startDate: '',
-          endDate: '',
-          location: '',
-        //   opponent: '',
-        //   league: '',
-          notes: '',
+    setup() {
+    const leagues = ref([]);
+    const teams = ref([]);
+    const formData = ref({
+      type: '',
+      startDate: '',
+      endDate: '',
+      location: '',
+      opponent: '',
+      league: '',
+      notes: '',
+    });
+    const fetchOpponents = async () => {
+      if (formData.value.league) {
+        try {
+          const teamData = await TeamService.getTeamsByLeague(formData.value.league); // Use TeamService
+          teams.value = teamData;
+          console.log("Teams fetched:", teams.value);
+        } catch (error) {
+          console.error("Failed to fetch teams:", error);
         }
-      };
-    },
-    methods: {
-      submitForm() {
-        // Replace 'https://example.com/api/endpoint' with your API endpoint URL
-        const endpointUrl = 'http://localhost:3000/events';
-  
-        axios.post(endpointUrl, this.formData)
-          .then(response => {
-            // Handle successful response
-            console.log('Data posted successfully:', response.data);
-          })
-          .catch(error => {
-            // Handle error
-            console.error('Error posting data:', error);
-          });
       }
-    }
+    };
+
+    const filteredOpponents = computed(() => {
+      return teams.value.filter(team => team.league === formData.value.league);
+    });
+
+    onMounted(async () => {
+      console.log("Fetching leagues");
+      try {
+        const leagueData = await LeagueService.getLeagues();
+        leagues.value = leagueData;
+        console.log("Leagues fetched:", leagues.value);
+      } catch (error) {
+        console.error("Failed to fetch leagues:", error);
+      }
+    });
+
+    return { leagues, teams, formData, fetchOpponents, filteredOpponents };
   }
+};
+
+//     onMounted(async () => {
+//       console.log("fetching leagues and opponent");
+//       // Fetch league data
+//       try {
+//         const leagueData = await LeagueService.getLeagues();
+//         leagues.value = leagueData;
+//         console.log("leagues fetched:", leagues.value);
+//       } catch (error) {
+//         console.error("Failed to fetch leagues:", error);
+//       }
+      
+//       // Fetch opponent data
+//       try {
+//         const opponentData = await TeamService.getOpponents();
+//         opponents.value = opponentData;
+//         console.log("opponents fetched:", opponents.value);
+//       } catch (error) {
+//         console.error("Failed to fetch opponent:", error);
+//       }
+//     });
+
+//     const submitForm = () => {
+//       const endpointUrl = 'http://localhost:3000/events';
+
+//       axios.post(endpointUrl, formData.value)
+//         .then(response => {
+//           // Handle successful response
+//           console.log('Data posted successfully:', response.data);
+//         })
+//         .catch(error => {
+//           // Handle error
+//           console.error('Error posting data:', error);
+//         });
+//     };
+
+//     return { leagues, opponents, formData, submitForm };
+//   }
+//   }
   </script>
  
 <style scoped>
