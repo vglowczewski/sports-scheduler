@@ -21,7 +21,7 @@
             <td>{{ formatTime(event.startDate) }}</td>
             <td>{{ formatTime(event.endDate) }}</td>
             <td>{{ event.location }}</td>
-            <td>{{ getOpponent(event) }}</td>
+            <td>{{ event.opponent.name }}</td>
             <td>{{ event.notes }}</td>
           </tr>
         </tbody>

@@ -18,10 +18,10 @@ router.get('/', async (req, res) => {
                 endDate: {
                     $lte: new Date(endDate)
                 }
-            }).populate('league');
+            }).populate('league').populate('opponent');
         }
         else {
-            events = await Event.find({}).populate('league'); //populate league field
+            events = await Event.find({}).populate('league').populate('opponent'); //populate league field and opponent
         }
         console.log(events);
         res.json(events);
@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
 //GET a specific event by id
 router.get('/:id', async (req, res) => {
     try {
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findById(req.params.id).populate('league').populate('opponent');
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
         }
