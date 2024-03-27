@@ -13,6 +13,7 @@ const League = require('./models/League');
 const authRoutes = require('./routes/auth');
 const eventsRoutes = require('./routes/events');
 const leaguesRoutes = require('./routes/leagues');
+const teamsRoutes = require('./routes/teams');
 const generateSalt = require('./saltGenerator');
 
 // Initialize Express app
@@ -35,6 +36,7 @@ app.use('/auth', authRoutes); // make sure the above two lines are set up before
 
 app.use('/events', eventsRoutes);
 app.use('/leagues', leaguesRoutes);
+app.use('/teams', teamsRoutes);
 
 const isAuthenticated = (req, res, next) => {
   // Passport adds 'req.user' property if user is authenticated

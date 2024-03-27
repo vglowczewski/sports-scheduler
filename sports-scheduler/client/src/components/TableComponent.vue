@@ -3,23 +3,25 @@
       <table>
         <thead>
           <tr>
-            <th>Type</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Location</th>
-            <th>Teams</th>
             <th>League</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Location</th>
+            <th>Opponent</th>
             <th>Notes</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="event in events" :key="event._id">
+            <td>{{ event.league.name }}</td>
             <td>{{ event.type }}</td>
             <td>{{ formatDate(event.startDate) }}</td>
-            <td>{{ formatDate(event.endDate) }}</td>
+            <td>{{ formatTime(event.startDate) }}</td>
+            <td>{{ formatTime(event.endDate) }}</td>
             <td>{{ event.location }}</td>
-            <td>{{ event.teams.join(', ') }}</td>
-            <td>{{ event.league }}</td>
+            <td>{{ getOpponent(event) }}</td>
             <td>{{ event.notes }}</td>
           </tr>
         </tbody>
@@ -38,6 +40,19 @@
   //method to format the date strings
   function formatDate(date) {
       return new Date(date).toLocaleDateString(); // fix the date
+  }
+
+  //method to format the time strings
+  function formatTime(date) {
+      return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); //fix the time
+  }
+
+  // Method to get opponent team name
+  function getOpponent(event) {
+    const userTeam = 'BVG'; // Replace this with your actual school's team name
+    const opponentTeam = event.teams.find(team => team !== userTeam); // Find opponent team
+
+    return opponentTeam ? opponentTeam : ''; // Return opponent team name or default message
   }
   </script>
   

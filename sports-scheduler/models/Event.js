@@ -18,9 +18,11 @@ const eventSchema = new Schema({
   location: { 
     type: String, 
     required: false },
-  teams: [{ 
-    type: String 
-  }],
+  opponent: {
+      type: Schema.Types.ObjectId,
+      ref: 'Team',
+      required: false,
+    },
   league: { 
     type: Schema.Types.ObjectId, 
     required: true,
