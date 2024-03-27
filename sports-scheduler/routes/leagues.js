@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const League = require('../models/League');
 const Event = require('../models/Event');
+const Team = require('../models/Team');
 
 // GET all leagues
 router.get('/', async (req, res) => {
@@ -68,6 +69,22 @@ router.get('/:leagueid/events', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+//GET all teams belonging to specific league
+router.get('/:leagueId/teams', async (req, res) => {
+    try {
+        console.log(req.params.leagueId)
+        const leagueId = req.params.leagueId;
+  
+      // Find teams associated with the league ID
+      const teams = await Team.find({ league: leagueId });
+  
+      res.json(teams);
+    } catch (error) {
+      console.error('Error fetching teams:', error);
+      res.status(500).json({ message: 'Server Error' });
     }
 });
 
