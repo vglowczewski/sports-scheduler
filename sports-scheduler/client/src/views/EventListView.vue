@@ -5,6 +5,7 @@ import EventService from '@/services/EventService.js'
 
 //events variable starts empty
 const events = ref([]);
+const isLoggedInAsAdmin = ref(true); // Assuming the user is logged in as admin initially
 
 onMounted(async () => {
   console.log("fetching events")
@@ -16,13 +17,14 @@ onMounted(async () => {
   } catch (error) {
     console.error("Failed to fetch events:", error);
   }
+  // checkAdminStatus();
 });
 </script>
 
 <template>
   <div>
     <h1>Events List</h1>
-    <Table :events="events"/>
+    <Table :events="events" :is-logged-in-as-admin="isLoggedInAsAdmin"/>
   </div>
 </template>
  

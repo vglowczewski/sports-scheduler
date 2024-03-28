@@ -80,48 +80,20 @@
       }
     });
 
-    return { leagues, teams, formData, fetchOpponents, filteredOpponents };
+    const submitForm = async () => {
+      const endpointUrl = 'https://mevn-0spf.onrender.com/events';
+      
+      try {
+        const response = await axios.post(endpointUrl, formData.value);
+        console.log('Data posted successfully:', response.data);
+      } catch (error) {
+        console.error('Error posting data:', error);
+      }
+    };
+
+    return { leagues, teams, formData, fetchOpponents, filteredOpponents, submitForm };
   }
 };
-
-//     onMounted(async () => {
-//       console.log("fetching leagues and opponent");
-//       // Fetch league data
-//       try {
-//         const leagueData = await LeagueService.getLeagues();
-//         leagues.value = leagueData;
-//         console.log("leagues fetched:", leagues.value);
-//       } catch (error) {
-//         console.error("Failed to fetch leagues:", error);
-//       }
-      
-//       // Fetch opponent data
-//       try {
-//         const opponentData = await TeamService.getOpponents();
-//         opponents.value = opponentData;
-//         console.log("opponents fetched:", opponents.value);
-//       } catch (error) {
-//         console.error("Failed to fetch opponent:", error);
-//       }
-//     });
-
-//     const submitForm = () => {
-//       const endpointUrl = 'http://localhost:3000/events';
-
-//       axios.post(endpointUrl, formData.value)
-//         .then(response => {
-//           // Handle successful response
-//           console.log('Data posted successfully:', response.data);
-//         })
-//         .catch(error => {
-//           // Handle error
-//           console.error('Error posting data:', error);
-//         });
-//     };
-
-//     return { leagues, opponents, formData, submitForm };
-//   }
-//   }
   </script>
  
 <style scoped>
