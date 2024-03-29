@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import EventListView from '../views/EventListView.vue'
 import EventDetailsView from '../views/EventDetailsView.vue'
 import AddEventView from '../views/AddEventView.vue'
+import LeagueManageView from '../views/LeagueManageView.vue'
 import AboutView from '../views/AboutView.vue'
 
 const router = createRouter({
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/addEvent',
       name: 'add-event',
       component: AddEventView,
+    },
+    {
+      path: '/manageLeague',
+      name: 'manage-league',
+      component: LeagueManageView,
     }
   ]
 })

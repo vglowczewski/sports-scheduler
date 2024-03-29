@@ -36,10 +36,19 @@
   </template>
   
   <script setup>
+  import { ref, defineEmits, defineProps } from 'vue';
+  import EventService from '@/services/EventService.js';
+
   const props = defineProps({
-  events: Array,
-  isLoggedInAsAdmin: Boolean
-});
+    events: Array,
+    isLoggedInAsAdmin: Boolean
+  });
+
+  const emit = defineEmits(['open-edit-modal']);
+
+  const events = ref(props.events); //make events reactive ref cause it'll change
+  console.log(events)
+  const isLoggedInAsAdmin = ref(props.isLoggedInAsAdmin);
   
   //method to format the date strings
   function formatDate(date) {
@@ -51,18 +60,22 @@
       return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); //fix the time
   }
 
-  function deleteEvent(eventId) {
-  console.log(`Deleting event with ID: ${eventId}`);
-  // Here you would typically call a method to update your data store or make an API call to delete the event
-  // For now, just filtering it out as a demonstration
-  events.value = events.value.filter(event => event._id !== eventId);
-}
+  async function deleteEvent(eventId) {
+    console.log(`Deleting event with ID: ${eventId}`);
+    try {
+      await EventService.deleteEvent(eventId); //use the delete event function
+      console.log(`Event with ID ${eventId} deleted successfully from the backend`);
+      events.value = events.value.filter(event => event._id !== eventId);
+    } catch (error) {
+      console.error(`Failed to delete event with ID ${eventId} from the backend:`, error);
+      return; // Exit the function if there's an error
+    }
+  }
 
-// Placeholder for editEvent function
-function editEvent(eventId) {
-  console.log(`Editing event with ID: ${eventId}`);
-  // This function would initiate the edit process, such as displaying a form with the event's data
-}
+  function editEvent(eventId) {
+    console.log(`Editing event with ID: ${eventId}`);
+    emit('open-edit-modal', eventId);
+  }
   </script>
   
   <style scoped>

@@ -36,9 +36,6 @@
   import { ref, onMounted, computed } from 'vue';
   import LeagueService from '@/services/LeagueService.js';
   import TeamService from '@/services/TeamService.js';
-
-
- 
     
   export default {
     setup() {
