@@ -1,4 +1,8 @@
 <template>
+  <div>
+    This is the Modal
+  </div>
+  <div>{{ show }}</div>
     <div class="modal" v-if="show">
     <div class="modal-content">
       <span class="close" @click="close">&times;</span>
@@ -10,10 +14,15 @@
   </template>
   
   <script setup>
-  import { ref, defineEmits, watch } from 'vue';
+  import { ref } from 'vue';
 
-  const show = ref(false); // control visibility
-  const eventId = ref(''); // Event ID
+  const props = defineProps({
+  show: Boolean,
+  eventId: String
+  });
+
+  const show = ref(props.show); // control visibility
+  const eventId = ref(props.eventId); // Event ID
   const emit = defineEmits(['close']);
 
   // Function to close the modal
@@ -21,12 +30,6 @@
     emit('close');
   };
 
-  // this wont work
-  watch(show, (newValue, oldValue) => {
-    console.log('watching')
-    console.log('show changed:', newValue);
-  });
-  
   </script>
   
   <style scoped>

@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Team = require('../models/Team');
+const Event = require('../models/Event');
 
 // Route to add a new team to a league
 router.post('/:leagueId', async (req, res) => {
@@ -34,5 +35,16 @@ router.post('/:leagueId', async (req, res) => {
       res.status(500).json({ message: 'Server Error' });
     }
   });  
+
+  router.get('/noLeague', async (req, res) => {
+    let teams;
+    try {
+      teams = await Team.find({league: null})
+      res.json(teams);
+    } catch(error) {
+      console.error('Error getting team:', error)
+      res.status(500).json({ message: 'Server Error' });
+    }
+  })
 
 module.exports = router;

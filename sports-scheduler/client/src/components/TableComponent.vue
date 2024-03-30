@@ -36,49 +36,48 @@
   </template>
   
   <script setup>
-  import { ref, defineEmits, defineProps } from 'vue';
-  import EventService from '@/services/EventService.js';
+import { defineProps, defineEmits, computed, ref } from 'vue';
+import EventService from '@/services/EventService.js';
 
-  const props = defineProps({
-    events: Array,
-    isLoggedInAsAdmin: Boolean
-  });
+const props = defineProps({
+  events: Array,
+  isLoggedInAsAdmin: Boolean
+});
 
-  const emit = defineEmits(['open-edit-modal']);
+const emit = defineEmits(['open-edit-modal']);
 
-  const events = ref(props.events); //make events reactive ref cause it'll change
-  console.log(events)
-  const isLoggedInAsAdmin = ref(props.isLoggedInAsAdmin);
-  
-  //method to format the date strings
-  function formatDate(date) {
-      return new Date(date).toLocaleDateString(); // fix the date
+// Use a computed property to derive filteredEvents from props.events
+const filteredEvents = computed(() => props.events);
+
+// Method to format the date strings
+function formatDate(date) {
+  return new Date(date).toLocaleDateString();
+}
+
+// Method to format the time strings
+function formatTime(date) {
+  return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+async function deleteEvent(eventId) {
+  console.log(`Deleting event with ID: ${eventId}`);
+  try {
+    await EventService.deleteEvent(eventId);
+    console.log(`Event with ID ${eventId} deleted successfully from the backend`);
+    emit('delete-event', eventId); // Emit an event to notify the parent component to update events
+  } catch (error) {
+    console.error(`Failed to delete event with ID ${eventId} from the backend:`, error);
+    return;
   }
+}
 
-  //method to format the time strings
-  function formatTime(date) {
-      return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); //fix the time
-  }
+function editEvent(eventId) {
+  console.log(`Editing event with ID: ${eventId}`);
+  emit('open-edit-modal', eventId);
+}
+</script>
 
-  async function deleteEvent(eventId) {
-    console.log(`Deleting event with ID: ${eventId}`);
-    try {
-      await EventService.deleteEvent(eventId); //use the delete event function
-      console.log(`Event with ID ${eventId} deleted successfully from the backend`);
-      events.value = events.value.filter(event => event._id !== eventId);
-    } catch (error) {
-      console.error(`Failed to delete event with ID ${eventId} from the backend:`, error);
-      return; // Exit the function if there's an error
-    }
-  }
-
-  function editEvent(eventId) {
-    console.log(`Editing event with ID: ${eventId}`);
-    emit('open-edit-modal', eventId);
-  }
-  </script>
-  
-  <style scoped>
+<style scoped>
 /* Add your table styles here */
 .table-container {
   overflow-x: auto;
@@ -99,5 +98,4 @@ tr:nth-child(even) {
   display: inline-block;
   margin-right: 5px;
 }
-
 </style>

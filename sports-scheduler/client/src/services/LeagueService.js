@@ -20,13 +20,22 @@ const apiClient = axios.create({
         throw error; // Re-throw the error to propagate it to the caller
       }
     },
-    async addLeagues(leagueData){
+    async addLeague(leagueData) {
       try {
         const response = await apiClient.post('/leagues/', leagueData);
-        console.log(response)
+        console.log("recieved by leagueservice", leagueData);
         return response.data; 
       } catch (error) {
-        throw new Error('Failed to add league:', error);
+        console.error('Failed to add league:', error);
+        throw error;
+      }
+    },
+    async deleteLeague(leagueId) {
+      try {
+        const response = await apiClient.delete(`/leagues/${leagueId}`);
+        return response.data;
+      } catch (error) {
+        throw new Error(`Failed to delete event with ID ${leagueId}: ${error.message}`);
       }
     } 
   }

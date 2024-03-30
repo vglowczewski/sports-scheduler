@@ -93,7 +93,7 @@ router.post('/', async (req, res) => {
     try {
         const league = new League(req.body);
         await league.save();
-        res.status(201).json({ message: 'League created successfully.', league }); 
+        res.status(201).json(league); 
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });

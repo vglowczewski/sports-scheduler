@@ -11,7 +11,6 @@ const User = require('./models/User'); // Assuming User model is defined in a se
 const Event = require('./models/Event');
 const League = require('./models/League');
 const Team = require('./models/Team');
-// const Team = require('./models/Team');
 const authRoutes = require('./routes/auth');
 const eventsRoutes = require('./routes/events');
 const leaguesRoutes = require('./routes/leagues');
