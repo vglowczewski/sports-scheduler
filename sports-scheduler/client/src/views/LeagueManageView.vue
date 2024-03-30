@@ -39,6 +39,9 @@
         <ul>
           <li v-for="team in teams" :key="team._id" :value="team._id">{{ team.name }}</li>
         </ul>
+        <ul>
+          <li v-for="availableTeam in availableTeams" :key="availableTeam._id" :value="availableTeam._id">{{ availableTeam.name }}</li>
+        </ul>
   </div>
   </div> 
 </div>
@@ -55,6 +58,7 @@ const formData = ref({
 });
 const leagues = ref([]);
 const teams = ref([]);
+const availableTeams = ref([]);
 const showModal = ref(false);
 
 const addLeague = async () => {
@@ -108,6 +112,7 @@ const addTeams = async (leagueId) => {
 
     const addableTeams = await TeamService.getAddableTeams();
     console.log("addable teams", addableTeams);
+    availableTeams.value = addableTeams;
   } catch(error){
     console.log('Error', error)
   }

@@ -47,4 +47,19 @@ router.post('/:leagueId', async (req, res) => {
     }
   })
 
+  // Update a team
+router.put('/:teamId', async (req, res) => {
+  const teamId = req.params.teamId;
+  try {
+      const updatedTeam = await Team.findByIdAndUpdate(teamId, req.body, { new: true });
+      if (!updatedTeam) {
+          return res.status(404).json({ message: 'Team not found' });
+      }
+      res.json({ message: 'Team updated successfully', team: updatedTeam });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 module.exports = router;
