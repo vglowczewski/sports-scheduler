@@ -29,5 +29,14 @@ const apiClient = axios.create({
         console.error('Error fetching addable teams:', error);
         throw error;
       }
-    }
+    },
+    async updateTeam(teamId, teamData) {
+      try {
+        const response = await apiClient.put(`/teams/${teamId}`, teamData);
+        return response.data; // Assuming the server responds with the updated event data
+      } catch (error) {
+        console.error(`Error updating team with ID ${teamId}:`, error);
+        throw error; // Rethrow the error to handle it in the calling context
+      }
+    }, 
   };

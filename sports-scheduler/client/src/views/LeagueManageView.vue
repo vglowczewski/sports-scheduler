@@ -40,7 +40,10 @@
           <li v-for="team in teams" :key="team._id" :value="team._id">{{ team.name }}</li>
         </ul>
         <ul>
-          <li v-for="availableTeam in availableTeams" :key="availableTeam._id" :value="availableTeam._id">{{ availableTeam.name }}</li>
+          <li v-for="availableTeam in availableTeams" :key="availableTeam._id" :value="availableTeam._id">
+            {{ availableTeam.name }}
+            <button @click="addTeamToLeague(availableTeam)">+</button>
+          </li>
         </ul>
   </div>
   </div> 
@@ -60,6 +63,7 @@ const leagues = ref([]);
 const teams = ref([]);
 const availableTeams = ref([]);
 const showModal = ref(false);
+const currentLeague = ref('');
 
 const addLeague = async () => {
   if (formData.value.name.trim() !== '' && formData.value.season.trim() !== '') {
@@ -105,6 +109,7 @@ const deleteLeague = async (leagueId) => {
 };
 
 const addTeams = async (leagueId) => {
+  currentLeague.value = leagueId;
   try {
     const currentTeams = await TeamService.getTeamsByLeague(leagueId);
     console.log("current teams", currentTeams);
@@ -119,10 +124,23 @@ const addTeams = async (leagueId) => {
   showModal.value = true;
 }
 
+const addTeamToLeague = async (team) => {
+  const teamData = {
+    name: team.name,
+    league: currentLeague
+  }
+  try {
+    await TeamService.updateTeam(team._id, teamData)
+  } catch(error){
+    console.log('Error adding team to league', error)
+  }
+}
+
 // Close edit modal function
 function closeModal() {
   console.log("Closing modal");
   showModal.value = false;
+  currentLeague.value = '';
 }
 
 onMounted(async () => {
