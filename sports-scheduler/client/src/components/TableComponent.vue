@@ -16,7 +16,7 @@
         </thead>
         <tbody>
           <tr v-for="event in events" :key="event._id">
-            <td>{{ event.league.name }}</td>
+            <td>{{ event.league ? event.league.name : 'Unknown' }}</td>
             <td>{{ event.type }}</td>
             <td>{{ formatDate(event.startDate) }}</td>
             <td>{{ formatTime(event.startDate) }}</td>
@@ -36,7 +36,7 @@
   </template>
   
   <script setup>
-import { defineProps, defineEmits, computed, ref } from 'vue';
+import { defineProps, defineEmits, computed } from 'vue';
 import EventService from '@/services/EventService.js';
 
 const props = defineProps({
@@ -48,54 +48,54 @@ const emit = defineEmits(['open-edit-modal']);
 
 // Use a computed property to derive filteredEvents from props.events
 const filteredEvents = computed(() => props.events);
-
-// Method to format the date strings
-function formatDate(date) {
-  return new Date(date).toLocaleDateString();
-}
-
-// Method to format the time strings
-function formatTime(date) {
-  return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-async function deleteEvent(eventId) {
-  console.log(`Deleting event with ID: ${eventId}`);
-  try {
-    await EventService.deleteEvent(eventId);
-    console.log(`Event with ID ${eventId} deleted successfully from the backend`);
-    emit('delete-event', eventId); // Emit an event to notify the parent component to update events
-  } catch (error) {
-    console.error(`Failed to delete event with ID ${eventId} from the backend:`, error);
-    return;
+  
+  // Method to format the date strings
+  function formatDate(date) {
+    return new Date(date).toLocaleDateString();
   }
-}
-
-function editEvent(eventId) {
-  console.log(`Editing event with ID: ${eventId}`);
-  emit('open-edit-modal', eventId);
-}
-</script>
-
-<style scoped>
-/* Add your table styles here */
-.table-container {
-  overflow-x: auto;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-th, td {
-  text-align: left;
-  padding: 8px;
-}
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.actions-column button {
-  display: inline-block;
-  margin-right: 5px;
-}
-</style>
+  
+  // Method to format the time strings
+  function formatTime(date) {
+    return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  
+  async function deleteEvent(eventId) {
+    console.log(`Deleting event with ID: ${eventId}`);
+    try {
+      await EventService.deleteEvent(eventId);
+      console.log(`Event with ID ${eventId} deleted successfully from the backend`);
+      emit('delete-event', eventId); // Emit an event to notify the parent component to update events
+    } catch (error) {
+      console.error(`Failed to delete event with ID ${eventId} from the backend:`, error);
+      return;
+    }
+  }
+  
+  function editEvent(eventId) {
+    console.log(`Editing event with ID: ${eventId}`);
+    emit('open-edit-modal', eventId);
+  }
+  </script>
+  
+  <style scoped>
+  /* Add your table styles here */
+  .table-container {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px;
+  }
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .actions-column button {
+    display: inline-block;
+    margin-right: 5px;
+  }
+  </style>

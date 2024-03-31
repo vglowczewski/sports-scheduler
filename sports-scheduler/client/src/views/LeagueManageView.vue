@@ -5,7 +5,11 @@
       <label for="leagueName">League Name:</label>
       <input type="text" id="leagueName" v-model="formData.name" required>
       <label for="season">Season:</label>
-      <input type="text" id="season" v-model="formData.season" required>
+      <select id="season" v-model="formData.season" required>
+        <option value="Fall">Fall</option>
+        <option value="Winter">Winter</option>
+        <option value="Spring">Spring</option>
+      </select>
       <button type="submit">Add League</button>
     </form>
     <div v-if="leagues.length">
@@ -31,10 +35,10 @@
         </tbody>
       </table>
     </div>
-    <!-- Modal -->
-    <div class="modal" v-if="showModal">
+    <!-- Teams Modal -->
+    <div class="modal" v-if="showTeamsModal">
       <div class="modal-content">
-        <span class="close" @click="closeModal">&times;</span>
+        <span class="close" @click="closeTeamsModal">&times;</span>
         <h2>Add Teams</h2>
         <ul>
           <li v-for="team in teams" :key="team._id" :value="team._id">{{ team.name }}</li>
@@ -45,8 +49,26 @@
             <button @click="addTeamToLeague(availableTeam)">+</button>
           </li>
         </ul>
-  </div>
+    </div>
   </div> 
+   <!-- Edit Modal -->
+   <div class="modal" v-if="showEditModal">
+      <div class="modal-content">
+        <span class="close" @click="closeEditModal">&times;</span>
+        <h2>Edit League</h2>
+        <form @submit.prevent="submitForm">
+        <label for="editLeagueName">League Name:</label>
+        <input type="text" id="editLeagueName" v-model="editFormData.name" required>
+        <label for="editSeason">Season:</label>
+        <select id="editSeason" v-model="editFormData.season" required>
+          <option value="Fall">Fall</option>
+          <option value="Winter">Winter</option>
+          <option value="Spring">Spring</option>
+        </select>
+        <button type="submit">Update League</button>
+      </form>
+      </div>
+    </div>
 </div>
 </template>
 
@@ -59,10 +81,16 @@ const formData = ref({
   name: '',
   season: ''
 });
+const editFormData = ref({
+  name: '',
+  season: ''
+});
 const leagues = ref([]);
 const teams = ref([]);
 const availableTeams = ref([]);
-const showModal = ref(false);
+const showTeamsModal = ref(false);
+const showEditModal = ref(false);
+const selectedLeagueId = ref('');
 const currentLeague = ref('');
 
 const addLeague = async () => {
@@ -78,6 +106,7 @@ const addLeague = async () => {
       leagues.value.push(league); // Push the league object to the leagues array
       formData.value.name = ''; // Clear name input field after adding league
       formData.value.season = ''; // Clear season input field after adding league
+      await fetchLeagues(); //retrigger the table so it gets updated
     } catch (error) {
       console.error('Error adding league:', error);
     }
@@ -88,6 +117,7 @@ const addLeague = async () => {
 
 const editLeague = (leagueId) => {
   console.log('Editing league with ID:', leagueId);
+  openEditModal(leagueId);
   // Add your logic to navigate to the edit league page or open a modal for editing
 };
 
@@ -111,37 +141,92 @@ const deleteLeague = async (leagueId) => {
 const addTeams = async (leagueId) => {
   currentLeague.value = leagueId;
   try {
-    const currentTeams = await TeamService.getTeamsByLeague(leagueId);
-    console.log("current teams", currentTeams);
-    teams.value = currentTeams;
-
-    const addableTeams = await TeamService.getAddableTeams();
-    console.log("addable teams", addableTeams);
-    availableTeams.value = addableTeams;
+    fetchTeams(leagueId);
+    fetchAddableTeams();
   } catch(error){
     console.log('Error', error)
   }
-  showModal.value = true;
+  showTeamsModal.value = true;
+}
+
+const fetchTeams = async (leagueId) => {
+  const currentTeams = await TeamService.getTeamsByLeague(leagueId);
+  console.log("current teams", currentTeams);
+  teams.value = currentTeams;
+}
+
+const fetchAddableTeams = async () => {
+  const addableTeams = await TeamService.getAddableTeams();
+  console.log("addable teams", addableTeams);
+  availableTeams.value = addableTeams;
 }
 
 const addTeamToLeague = async (team) => {
   const teamData = {
     name: team.name,
-    league: currentLeague
+    league: currentLeague.value
   }
   try {
-    await TeamService.updateTeam(team._id, teamData)
+    await TeamService.updateTeam(team._id, teamData);
+    fetchTeams(currentLeague.value);
+    fetchAddableTeams();
   } catch(error){
     console.log('Error adding team to league', error)
   }
 }
 
 // Close edit modal function
-function closeModal() {
-  console.log("Closing modal");
-  showModal.value = false;
+function closeTeamsModal() {
+  console.log("Closing teams modal");
+  showTeamsModal.value = false;
   currentLeague.value = '';
 }
+
+async function openEditModal(leagueId) {
+  console.log("Opening edit modal for league with ID:", leagueId);
+  selectedLeagueId.value = leagueId;
+  try {
+    const league = leagues.value.find(league => league._id === leagueId);
+    if (league) {
+      editFormData.value.name = league.name;
+      editFormData.value.season = league.season;
+    } else {
+      console.error("League not found");
+    }
+  } catch (error) {
+    console.error("Failed to fetch league details:", error);
+  }
+  showEditModal.value = true;
+}
+
+function closeEditModal() {
+  console.log("Closing edit modal");
+  showEditModal.value = false;
+}
+
+const fetchLeagues = async () => {
+  try {
+    const leagueData = await LeagueService.getLeagues();
+    leagues.value = leagueData;
+    console.log("Leagues fetched:", leagues.value);
+  } catch (error) {
+    console.error("Failed to fetch leagues:", error);
+  }
+};
+
+async function submitForm() {
+  try {
+    console.log("selectedLeagueId", selectedLeagueId.value)
+    await LeagueService.updateLeague(selectedLeagueId.value, editFormData.value);
+    await fetchLeagues();
+    alert('League updated successfully');
+    closeEditModal();
+  } catch (error) {
+    console.error('Failed to update league:', error);
+    alert('Failed to update league.');
+  }
+}
+
 
 onMounted(async () => {
   try {
@@ -156,8 +241,8 @@ onMounted(async () => {
 
 </script>
   
-  <style>
-  .table-container {
+<style>
+.table-container {
   overflow-x: auto;
 }
 table {
@@ -172,10 +257,6 @@ tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-.actions-column button {
-  display: inline-block;
-  margin-right: 5px;
-}
 .modal {
   position: fixed;
   z-index: 1;

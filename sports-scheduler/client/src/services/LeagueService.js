@@ -37,5 +37,14 @@ const apiClient = axios.create({
       } catch (error) {
         throw new Error(`Failed to delete event with ID ${leagueId}: ${error.message}`);
       }
-    } 
+    } ,
+    async updateLeague(leagueId, leagueData) {
+      try {
+        const response = await apiClient.put(`/leagues/${leagueId}`, leagueData);
+        return response.data;
+      } catch (error) {
+        console.error(`Error updating league with ID ${leagueId}:`, error);
+        throw error; // Rethrow the error to handle it in the calling context
+      }
+    }, 
   }

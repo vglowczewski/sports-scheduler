@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Table from '@/components/TableComponent.vue';
 // import EditModal from '@/components/EditModal.vue';
 import LeagueService from '@/services/LeagueService.js';
@@ -15,7 +15,7 @@ const showEditModal = ref(false);
 const selectedLeagues = ref([]);
 const filteredEvents = ref([]); 
 const selectedEventId = ref('');
-const formData = ref({
+const editFormData = ref({
   type: '',
   startDate: '',
   endDate: '',
@@ -23,6 +23,10 @@ const formData = ref({
   opponent: '',
   league: '',
   notes: '',
+});
+const filterData = ref({
+  startDate: '',
+  endDate: '',
 });
 
 
@@ -32,7 +36,7 @@ onMounted(async () => {
     await fetchEvents();
     await fetchLeagues();
     filteredEvents.value = events.value;
-    console.log(filteredEvents)
+    console.log("filteredEvents", filteredEvents.value)
   } catch (error) {
     console.error("Error:", error);
   }
@@ -52,8 +56,8 @@ async function fetchLeagues() {
   try {
     const leagueData = await LeagueService.getLeagues();
     leagues.value = leagueData;
-    if (leagueData.length > 0) {
-      formData.value.league = leagueData[0]._id; // Set default league
+    if (leagueData.length > 0 && !editFormData.value.league) { // Check if editFormData.value.league is not already set
+      editFormData.value.league = leagueData[0]._id; // Set default league
       await fetchOpponents(leagueData[0]._id); // Fetch opponents for the default league
     }
   } catch (error) {
@@ -62,9 +66,9 @@ async function fetchLeagues() {
 }
 
 const fetchOpponents = async () => {
-  if (formData.value.league) {
+  if (editFormData.value.league) {
     try {
-      const teamData = await TeamService.getTeamsByLeague(formData.value.league); // Use TeamService
+      const teamData = await TeamService.getTeamsByLeague(editFormData.value.league); // Use TeamService
       teams.value = teamData;
       console.log("Teams fetched:", teams.value);
     } catch (error) {
@@ -74,11 +78,11 @@ const fetchOpponents = async () => {
 };
 
 const filteredOpponents = computed(() => {
-  return teams.value.filter(team => team.league === formData.value.league);
+  return teams.value.filter(team => team.league === editFormData.value.league);
 });
 
 function filterEvents() {
-  const hasDateFilter = formData.value.startDate && formData.value.endDate;
+  const hasDateFilter = filterData.value.startDate && filterData.value.endDate;
   const hasLeagueFilter = selectedLeagues.value.length > 0;
 
   if (!hasDateFilter && !hasLeagueFilter) {
@@ -86,9 +90,9 @@ function filterEvents() {
     return;
   }
 
-    // Convert formData.startDate and formData.endDate to ISO format
-    const selectedStartDate = formData.value.startDate ? new Date(formData.value.startDate).toISOString().slice(0, 19).replace('T', ' ') : null;
-    const selectedEndDate = formData.value.endDate ? new Date(formData.value.endDate).toISOString().slice(0, 19).replace('T', ' ') : null;
+    // Convert filterData.startDate and filterData.endDate to ISO format
+    const selectedStartDate = filterData.value.startDate ? new Date(filterData.value.startDate).toISOString().slice(0, 19).replace('T', ' ') : null;
+    const selectedEndDate = filterData.value.endDate ? new Date(filterData.value.endDate).toISOString().slice(0, 19).replace('T', ' ') : null;
     // Apply date filter
     const filteredByDate = events.value.filter(event => {
     const startDate = event.startDate;
@@ -133,8 +137,8 @@ async function openEditModal(eventId) {
       const formattedStartDate = new Date(eventData.startDate).toISOString().slice(0, 16);
       const formattedEndDate = new Date(eventData.endDate).toISOString().slice(0, 16);
 
-      // Populate formData with event data
-      formData.value = {
+      // Populate editFormData with event data
+      editFormData.value = {
         type: eventData.type,
         startDate: formattedStartDate,
         endDate: formattedEndDate,
@@ -143,6 +147,8 @@ async function openEditModal(eventId) {
         opponent: eventData.opponent,
         notes: eventData.notes,
       };
+
+      editFormData.value.league = eventData.league._id;
 
       // Fetch leagues and teams data
       await fetchLeagues();
@@ -169,13 +175,9 @@ function closeEditModal() {
 const submitForm = async () => {
   try {
     // Update the event
-    await EventService.updateEvent(selectedEventId.value, formData.value);
+    await EventService.updateEvent(selectedEventId.value, editFormData.value);
     // Refresh events
-    // events.value = await EventService.getEvents(); why wont this line work
     const updatedEvents = await EventService.getEvents();
-    // console.log("events", events.value)
-    // events.value = updatedEvents
-    // console.log("updatedEvents", events.value)
     events.value.splice(0, events.value.length, ...updatedEvents); // Clear and replace with new data
     alert('Event updated successfully');
     closeEditModal();
@@ -184,6 +186,15 @@ const submitForm = async () => {
     alert('Failed to update event.');
   }
 };
+
+//reset the filters 
+function resetFilters() {
+  selectedLeagues.value = [];
+  filterData.value.startDate = '';
+  filterData.value.endDate = '';
+  filterEvents();
+}
+
 </script>
 
 <template>
@@ -191,11 +202,11 @@ const submitForm = async () => {
     <h1>Events List</h1>
     <div>
       <label for="startDate">Start Date:</label>
-      <input type="datetime-local" id="startDate" v-model="formData.startDate" required>
+      <input type="datetime-local" id="startDate" v-model="filterData.startDate" required>
     </div>
     <div>
       <label for="endDate">End Date:</label>
-      <input type="datetime-local" id="endDate" v-model="formData.endDate" required>
+      <input type="datetime-local" id="endDate" v-model="filterData.endDate" required>
     </div>
     <!-- League picklist -->
     <div>
@@ -207,6 +218,9 @@ const submitForm = async () => {
     <!-- Filter button -->
     <div>
       <button @click="handleFilterClick">Filter</button>
+    </div>
+    <div>
+      <button @click="resetFilters">Reset Filters</button>
     </div>
     <!-- Conditionally render the TableComponent so it's not empty -->
     <div v-if="filteredEvents.length > 0">
@@ -223,29 +237,29 @@ const submitForm = async () => {
         <h2>Edit Event</h2>
       <form @submit.prevent="submitForm">
         <label for="type">Type:</label>
-        <select id="type" v-model="formData.type" required>
+        <select id="type" v-model="editFormData.type" required>
             <option value="practice">Practice</option>
             <option value="game">Game</option>
             <option value="tournament">Tournament</option>
         </select>
         <label for="startDate">Start Date</label>
-        <input type="datetime-local" id="startDate" v-model="formData.startDate" required>
+        <input type="datetime-local" id="startDate" v-model="editFormData.startDate" required>
         <label for="endDate">End Date</label>
-        <input type="datetime-local" id="endDate" v-model="formData.endDate" required>
+        <input type="datetime-local" id="endDate" v-model="editFormData.endDate" required>
         <label for="location">Location</label>
-        <input type="text" id="location" v-model="formData.location" required>
+        <input type="text" id="location" v-model="editFormData.location" required>
         <label for="league">League</label>
-        <select id="league" v-model="formData.league" @change="fetchOpponents" required>
+        <select id="league" v-model="editFormData.league" @change="fetchOpponents" required>
             <option value="">Select a League</option>
             <option v-for="league in leagues" :key="league._id" :value="league._id">{{ league.name }}</option>
         </select>
         <label for="opponent">Opponent</label>
-        <select id="opponent" v-model="formData.opponent">
+        <select id="opponent" v-model="editFormData.opponent">
             <option value="">Select an Opponent</option>
             <option v-for="opponent in filteredOpponents" :key="opponent._id" :value="opponent">{{ opponent.name }}</option>
         </select>
         <label for="notes">Notes</label>
-        <input type="text" id="notes" v-model="formData.notes">
+        <input type="text" id="notes" v-model="editFormData.notes">
         <button type="submit">Update Event</button>
       </form>
       </div>
