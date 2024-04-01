@@ -4,12 +4,18 @@ import EventDetailsView from '../views/EventDetailsView.vue'
 import AddEventView from '../views/AddEventView.vue'
 import LeagueManageView from '../views/LeagueManageView.vue'
 import AboutView from '../views/AboutView.vue'
+import HomeView from "../views/HomeView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: "/",
+      name: "home",
+      component: HomeView,
+    },
+    {
+      path: '/events',
       name: 'event-list',
       component: EventListView,
     },
@@ -32,7 +38,13 @@ const router = createRouter({
       path: '/manageLeague',
       name: 'manage-league',
       component: LeagueManageView,
-    }
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: () =>
+        import("../views/LoginView.vue"),
+    },
   ]
 })
 
