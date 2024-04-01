@@ -6,6 +6,8 @@ import LeagueService from '@/services/LeagueService.js';
 import EventService from '@/services/EventService.js';
 import TeamService from '@/services/TeamService.js'
 
+const isLoadingEvents = ref(true);
+
 //events variable starts empty
 const events = ref([]);
 const leagues = ref([]);
@@ -39,6 +41,9 @@ onMounted(async () => {
     console.log("filteredEvents", filteredEvents.value)
   } catch (error) {
     console.error("Error:", error);
+  } finally {
+    // Set isLoadingEvents to false after fetching
+    isLoadingEvents.value = false;
   }
 });
 
@@ -149,6 +154,7 @@ async function openEditModal(eventId) {
       };
 
       editFormData.value.league = eventData.league._id;
+      editFormData.value.opponent = eventData.opponent._id
 
       // Fetch leagues and teams data
       await fetchLeagues();
@@ -173,6 +179,9 @@ function closeEditModal() {
 
 
 const submitForm = async () => {
+  if (editFormData.value.type === 'tournament' || editFormData.value.type === 'practice') {
+    editFormData.value.opponent = ''; // Or however you wish to indicate no specific opponent
+  }
   try {
     // Update the event
     await EventService.updateEvent(selectedEventId.value, editFormData.value);
@@ -222,13 +231,14 @@ function resetFilters() {
     <div>
       <button @click="resetFilters">Reset Filters</button>
     </div>
-    <!-- Conditionally render the TableComponent so it's not empty -->
-    <div v-if="filteredEvents.length > 0">
+    <div v-if="isLoadingEvents">
+      <p>Events Loading...</p>
+    </div>
+    <div v-else-if="filteredEvents.length > 0">
       <Table :events="filteredEvents" :is-logged-in-as-admin="isLoggedInAsAdmin" @open-edit-modal="openEditModal"/>
     </div>
     <div v-else>
-      <!-- Display a loading indicator or message -->
-      <p>No Events To Display</p>
+      <p>No events to display.</p>
     </div>
         <!-- Modal -->
         <div class="modal" v-if="showEditModal">
@@ -253,11 +263,11 @@ function resetFilters() {
             <option value="">Select a League</option>
             <option v-for="league in leagues" :key="league._id" :value="league._id">{{ league.name }}</option>
         </select>
-        <label for="opponent">Opponent</label>
-        <select id="opponent" v-model="editFormData.opponent">
-            <option value="">Select an Opponent</option>
-            <option v-for="opponent in filteredOpponents" :key="opponent._id" :value="opponent">{{ opponent.name }}</option>
-        </select>
+        <label for="opponent" v-if="editFormData.type !== 'tournament' && editFormData.type !== 'practice'">Opponent</label>
+      <select id="opponent" v-model="editFormData.opponent" v-if="editFormData.type !== 'tournament' && editFormData.type !== 'practice'">
+          <option value="">Select an Opponent</option>
+          <option v-for="opponent in filteredOpponents" :key="opponent._id" :value="opponent._id">{{ opponent.name }}</option>
+      </select>
         <label for="notes">Notes</label>
         <input type="text" id="notes" v-model="editFormData.notes">
         <button type="submit">Update Event</button>

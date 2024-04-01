@@ -39,4 +39,14 @@ const apiClient = axios.create({
         throw error; // Rethrow the error to handle it in the calling context
       }
     }, 
+    async createTeam(teamData) {
+      try {
+          const response = await apiClient.post(`/teams`, teamData);
+          console.log("Received by TeamService");
+          return response.data; 
+      } catch (error) {
+          console.error('Failed to add team:', error);
+          throw error;
+      }
+  }
   };

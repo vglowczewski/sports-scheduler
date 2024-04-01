@@ -20,6 +20,19 @@ router.post('/:leagueId', async (req, res) => {
       res.status(500).json({ message: 'Server Error' });
     }
   });
+
+// Route to add a new team without giving it with a league
+router.post('/', async (req, res) => {
+  try {
+      const { name } = req.body;
+      const newTeam = new Team({ name });
+      await newTeam.save();
+      res.json(newTeam);
+  } catch (error) {
+      console.error('Error adding team:', error);
+      res.status(500).json({ message: 'Server Error' });
+  }
+});
   
   // Route to delete a team from a league
   router.delete('/:teamId', async (req, res) => {

@@ -102,11 +102,20 @@ const addLeague = async () => {
       };
 
       const response = await LeagueService.addLeague(leagueData);
-      const league = response.league; // Response should contain the league object directly
-      leagues.value.push(league); // Push the league object to the leagues array
-      formData.value.name = ''; // Clear name input field after adding league
-      formData.value.season = ''; // Clear season input field after adding league
+      const leagueId = response._id; // Access the league ID from the response
+
+      // Push the newly added league to the leagues array
+      leagues.value.push({
+        _id: leagueId, // Ensure the league object has the _id property
+        name: formData.value.name,
+        season: formData.value.season
+      });
+
+      formData.value.name = ''; // empty the name input field after adding league
+      formData.value.season = ''; // empty the season input field after adding league
+
       await fetchLeagues(); //retrigger the table so it gets updated
+
     } catch (error) {
       console.error('Error adding league:', error);
     }
@@ -117,8 +126,7 @@ const addLeague = async () => {
 
 const editLeague = (leagueId) => {
   console.log('Editing league with ID:', leagueId);
-  openEditModal(leagueId);
-  // Add your logic to navigate to the edit league page or open a modal for editing
+  openEditModal(leagueId); //trigger the opening of the edit modal
 };
 
 const deleteLeague = async (leagueId) => {
@@ -128,9 +136,8 @@ const deleteLeague = async (leagueId) => {
       // Send a request to delete the league with the specified ID
       await LeagueService.deleteLeague(leagueId);
       
-      // Remove the league from the leagues array
+      // Remove the league from the leagues array because now deleted
       leagues.value = leagues.value.filter(league => league._id !== leagueId);
-      
       console.log("League deleted successfully.");
     }
   } catch (error) {
@@ -138,6 +145,7 @@ const deleteLeague = async (leagueId) => {
   }
 };
 
+// Add Teams to a league
 const addTeams = async (leagueId) => {
   currentLeague.value = leagueId;
   try {
@@ -149,18 +157,21 @@ const addTeams = async (leagueId) => {
   showTeamsModal.value = true;
 }
 
+// Get the Teams that belong to a specific league
 const fetchTeams = async (leagueId) => {
   const currentTeams = await TeamService.getTeamsByLeague(leagueId);
   console.log("current teams", currentTeams);
   teams.value = currentTeams;
 }
 
+// Get all the teams that are available to be added to the league
 const fetchAddableTeams = async () => {
   const addableTeams = await TeamService.getAddableTeams();
   console.log("addable teams", addableTeams);
   availableTeams.value = addableTeams;
 }
 
+// Add the team to the league
 const addTeamToLeague = async (team) => {
   const teamData = {
     name: team.name,
@@ -175,13 +186,14 @@ const addTeamToLeague = async (team) => {
   }
 }
 
-// Close edit modal function
+// Close teams modal function
 function closeTeamsModal() {
   console.log("Closing teams modal");
   showTeamsModal.value = false;
   currentLeague.value = '';
 }
 
+// Open the Edit Modal for user to update league
 async function openEditModal(leagueId) {
   console.log("Opening edit modal for league with ID:", leagueId);
   selectedLeagueId.value = leagueId;
@@ -199,11 +211,13 @@ async function openEditModal(leagueId) {
   showEditModal.value = true;
 }
 
+// Close the Edit Modal when user complete
 function closeEditModal() {
   console.log("Closing edit modal");
   showEditModal.value = false;
 }
 
+// Get all the leagues
 const fetchLeagues = async () => {
   try {
     const leagueData = await LeagueService.getLeagues();
@@ -214,6 +228,7 @@ const fetchLeagues = async () => {
   }
 };
 
+// When button clicked in the edit form
 async function submitForm() {
   try {
     console.log("selectedLeagueId", selectedLeagueId.value)

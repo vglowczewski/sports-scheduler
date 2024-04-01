@@ -3,7 +3,7 @@
       <h1>Add Event</h1>
       <form @submit.prevent="submitForm">
         <label for="type">Type:</label>
-        <select id="type"  v-model="formData.type" required>
+        <select id="type"  v-model="formData.type" required  @change="handleTypeChange">
             <option value="practice">Practice</option>
             <option value="game">Game</option>
             <option value="tournament">Tournament</option>
@@ -19,11 +19,17 @@
             <option value="">Select a League</option>
             <option v-for="league in leagues" :key="league._id" :value="league._id">{{ league.name }}</option>
         </select>
-        <label for="opponent">Opponent</label>
+        <!-- Conditionally render opponent selection based on event type -->
+        <label for="opponent" v-if="formData.type !== 'tournament' && formData.type !== 'practice'">Opponent</label>
+        <select id="opponent" v-model="formData.opponent" required v-if="formData.type !== 'tournament' && formData.type !== 'practice'">
+          <option value="">Select an Opponent</option>
+          <option v-for="opponent in filteredOpponents" :key="opponent._id" :value="opponent._id">{{ opponent.name }}</option>
+        </select>
+        <!-- <label for="opponent">Opponent</label>
         <select id="opponent" v-model="formData.opponent" required>
             <option value="">Select an Opponent</option>
             <option v-for="opponent in filteredOpponents" :key="opponent._id" :value="opponent._id">{{ opponent.name }}</option>
-        </select>
+        </select> -->
         <label for="notes">Notes</label>
         <input type="text" id="notes"  v-model="formData.notes">
         <button type="submit">Submit</button>
@@ -88,7 +94,14 @@
       }
     };
 
-    return { leagues, teams, formData, fetchOpponents, filteredOpponents, submitForm };
+        // Function to handle type change and reset opponent field for tournaments
+    const handleTypeChange = () => {
+      if (formData.value.type === 'tournament' || formData.value.type === 'practice') {
+        formData.value.opponent = ''; // Reset opponent field if type is tournament
+      }
+    };
+
+    return { leagues, teams, formData, fetchOpponents, filteredOpponents, submitForm, handleTypeChange };
   }
 };
   </script>
