@@ -39,14 +39,24 @@ const apiClient = axios.create({
         throw error; // Rethrow the error to handle it in the calling context
       }
     }, 
-    async createTeam(teamData) {
+    async createTeam(teamData, leagueId) {
       try {
-          const response = await apiClient.post(`/teams`, teamData);
-          console.log("Received by TeamService");
-          return response.data; 
+        const response = await apiClient.post(`/teams/${leagueId}`, teamData);
+        console.log("Received by TeamService");
+        return response.data; 
       } catch (error) {
-          console.error('Failed to add team:', error);
-          throw error;
+        console.error('Failed to add team:', error);
+        throw error;
       }
-  }
+    },
+    async deleteTeam(teamId) {
+      try {
+        const response = await apiClient.delete(`/teams/${teamId}`);
+        console.log("Team deleted successfully");
+        return response.data;
+      } catch (error) {
+        console.error('Failed to delete team:', error);
+        throw error;
+      }
+    }
   };

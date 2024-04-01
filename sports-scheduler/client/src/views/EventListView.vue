@@ -180,7 +180,7 @@ function closeEditModal() {
 
 const submitForm = async () => {
   if (editFormData.value.type === 'tournament' || editFormData.value.type === 'practice') {
-    editFormData.value.opponent = ''; // Or however you wish to indicate no specific opponent
+    editFormData.value.opponent = null; // Or however you wish to indicate no specific opponent
   }
   try {
     // Update the event

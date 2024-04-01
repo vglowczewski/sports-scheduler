@@ -29,7 +29,7 @@
             <td>
               <button @click="editLeague(league._id)">Edit</button>
               <button @click="deleteLeague(league._id)">Delete</button>
-              <button @click="addTeams(league._id)">Add Teams</button>
+              <button @click="manageTeams(league._id)">Manage Teams</button>
             </td>
           </tr>
         </tbody>
@@ -39,16 +39,29 @@
     <div class="modal" v-if="showTeamsModal">
       <div class="modal-content">
         <span class="close" @click="closeTeamsModal">&times;</span>
-        <h2>Add Teams</h2>
+        <h1>Manage Teams</h1>
+        <h2 v-if="teams.length > 0">Current Teams</h2>
         <ul>
-          <li v-for="team in teams" :key="team._id" :value="team._id">{{ team.name }}</li>
+         <li v-for="team in teams" :key="team._id" :value="team._id">
+            {{ team.name }}
+           <!-- button to remove team from league -->
+           <button @click="removeTeamFromLeague(team)">X</button>
+          </li>
         </ul>
+        <!-- Add Team Form -->
+        <h2>Add Team</h2>
+        <form @submit.prevent="addTeamToLeague">
+          <label for="teamName">Team Name:</label>
+          <input type="text" id="teamName" v-model="newTeamName" required>
+          <button type="submit">Add Team</button>
+        </form>
+        <!-- <h2 v-if="availableTeams.length > 0">Available Teams</h2>
         <ul>
           <li v-for="availableTeam in availableTeams" :key="availableTeam._id" :value="availableTeam._id">
             {{ availableTeam.name }}
             <button @click="addTeamToLeague(availableTeam)">+</button>
           </li>
-        </ul>
+        </ul> -->
     </div>
   </div> 
    <!-- Edit Modal -->
@@ -87,11 +100,12 @@ const editFormData = ref({
 });
 const leagues = ref([]);
 const teams = ref([]);
-const availableTeams = ref([]);
+// const availableTeams = ref([]);
 const showTeamsModal = ref(false);
 const showEditModal = ref(false);
 const selectedLeagueId = ref('');
-const currentLeague = ref('');
+// const currentLeague = ref('');
+const newTeamName = ref('');
 
 const addLeague = async () => {
   if (formData.value.name.trim() !== '' && formData.value.season.trim() !== '') {
@@ -146,11 +160,12 @@ const deleteLeague = async (leagueId) => {
 };
 
 // Add Teams to a league
-const addTeams = async (leagueId) => {
-  currentLeague.value = leagueId;
+const manageTeams = async (leagueId) => {
   try {
-    fetchTeams(leagueId);
-    fetchAddableTeams();
+    // Set the selected league ID
+    selectedLeagueId.value = leagueId;
+    // Fetch teams for the selected league
+    await fetchTeams(leagueId);
   } catch(error){
     console.log('Error', error)
   }
@@ -165,24 +180,48 @@ const fetchTeams = async (leagueId) => {
 }
 
 // Get all the teams that are available to be added to the league
-const fetchAddableTeams = async () => {
-  const addableTeams = await TeamService.getAddableTeams();
-  console.log("addable teams", addableTeams);
-  availableTeams.value = addableTeams;
+// const fetchAddableTeams = async () => {
+//   const addableTeams = await TeamService.getAddableTeams();
+//   console.log("addable teams", addableTeams);
+//   availableTeams.value = addableTeams;
+// }
+
+// Add Team To League Function
+const addTeamToLeague = async () => {
+  if (newTeamName.value.trim() !== '') {
+    try {
+      // Ensure selectedLeagueId is not empty
+      if (selectedLeagueId.value) {
+        const teamData = {
+          name: newTeamName.value,
+          // Pass the selected league ID to the createTeam method
+          league: selectedLeagueId.value
+        };
+        // Call createTeam with teamData and selectedLeagueId.value
+        await TeamService.createTeam(teamData, selectedLeagueId.value);
+        // Fetch teams for the selected league after adding a new team
+        await fetchTeams(selectedLeagueId.value);
+        newTeamName.value = ''; // Clear input field after adding team
+      } else {
+        console.error('No league selected to add team to.');
+      }
+    } catch(error){
+      console.log('Error adding team to league', error)
+    }
+  } else {
+    alert('Please enter a team name.');
+  }
 }
 
-// Add the team to the league
-const addTeamToLeague = async (team) => {
-  const teamData = {
-    name: team.name,
-    league: currentLeague.value
-  }
+// Remove Team From League Function
+const removeTeamFromLeague = async (team) => {
   try {
-    await TeamService.updateTeam(team._id, teamData);
-    fetchTeams(currentLeague.value);
-    fetchAddableTeams();
-  } catch(error){
-    console.log('Error adding team to league', error)
+    // Call the TeamService method to delete the team entirely
+    await TeamService.deleteTeam(team._id);
+    // Fetch teams for the selected league after removing the team
+    fetchTeams(selectedLeagueId.value);
+  } catch(error) {
+    console.error('Error removing team from league', error);
   }
 }
 
@@ -190,7 +229,7 @@ const addTeamToLeague = async (team) => {
 function closeTeamsModal() {
   console.log("Closing teams modal");
   showTeamsModal.value = false;
-  currentLeague.value = '';
+  // currentLeague.value = '';
 }
 
 // Open the Edit Modal for user to update league
