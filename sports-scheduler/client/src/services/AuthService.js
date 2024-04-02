@@ -1,7 +1,7 @@
 // Import Axios for making HTTP requests
 import axios from 'axios'
 
-const API_URL = 'https://mevn-0spf.onrender.com'; // Replace this with your backend API URL
+const apiClient = 'https://mevn-0spf.onrender.com'; // Replace this with your backend API URL
 
 const AuthService = {
   async login(credentials) {
@@ -9,7 +9,7 @@ const AuthService = {
       // const email = credentials.email
       // const password = credentials.password
       // Make a POST request to your backend API to authenticate the user
-      const response = await axios.post(`${API_URL}/auth/login`, credentials, {
+      const response = await axios.post(`${apiClient}/auth/login`, credentials, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
