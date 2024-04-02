@@ -5,8 +5,8 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const enviro = require('dotenv')
-enviro.config()
+// const enviro = require('dotenv')
+// enviro.config()
 
 // POST request to handle login form submission
 router.post('/login', (req, res, next) => {
