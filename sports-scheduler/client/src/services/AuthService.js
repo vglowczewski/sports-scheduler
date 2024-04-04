@@ -11,7 +11,8 @@ const AuthService = {
       // Make a POST request to your backend API to authenticate the user
       const response = await axios.post(`${apiClient}/auth/login`, credentials, {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/json'
+          // 'application/x-www-form-urlencoded'
           //'application/json'
         }
       })
