@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
+const enviro = require('dotenv')
+enviro.config()
+
 
 // Replace <password> with your MongoDB Atlas password
-const mongoURI = 'mongodb+srv://admin:QNW38LM1FR0ev2yQ@cluster0.zasc2xx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const mongoURI = `mongodb+srv://admin:${process.env.PASSWORD}@cluster0.zasc2xx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
   const connectToMongoDB = async (uri) => {
     try {
