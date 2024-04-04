@@ -46,8 +46,9 @@ const isAuthenticated = (req, res, next) => {
     // User is authenticated, proceed to the next middleware
     return next();
   }
+  return res.status(401).json({ message: 'Authentication failed' });
   // User is not authenticated, redirect to login page or send error response
-  res.redirect('/login'); // Redirect to login page
+  // res.redirect('/login'); // Redirect to login page
 };
 
 // Middleware function to check if user has specific role/permission

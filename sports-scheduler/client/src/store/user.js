@@ -18,12 +18,12 @@ export default {
     actions: {
       async loginUser({ commit }, credentials) {
         try {
-          console.log(credentials)
+          console.log("credentials", credentials)
           // Call AuthService to authenticate the user
           const user = await AuthService.login(credentials);
           // Upon successful authentication, commit the setUser mutation
           commit('setUser', user);
-          console.log(user)
+          console.log("user", user)
         } catch (error) {
           // Handle authentication errors
           console.error('Login failed:', error);

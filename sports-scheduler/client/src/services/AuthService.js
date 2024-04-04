@@ -12,11 +12,12 @@ const AuthService = {
       const response = await axios.post(`${apiClient}/auth/login`, credentials, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
+          //'application/json'
         }
       })
 
       // Check if the login was successful
-      if (response.status === 200) {
+      if (response.status === 200 && response.data) {
         console.log(response.data)
         return response.data; // Return the user data
       } else {

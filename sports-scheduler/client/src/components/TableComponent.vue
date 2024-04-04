@@ -16,7 +16,7 @@
         </thead>
         <tbody>
           <tr v-for="event in events" :key="event._id">
-            <td>{{ event.league ? event.league.name : 'Unknown' }}</td>
+            <td >{{ event.league ? event.league.name : 'Unknown' }}</td>
             <td>{{ event.type }}</td>
             <td>{{ formatDate(event.startDate) }}</td>
             <td>{{ formatTime(event.startDate) }}</td>
