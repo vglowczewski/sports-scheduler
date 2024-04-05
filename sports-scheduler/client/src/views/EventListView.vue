@@ -5,6 +5,20 @@ import Table from '@/components/TableComponent.vue';
 import LeagueService from '@/services/LeagueService.js';
 import EventService from '@/services/EventService.js';
 import TeamService from '@/services/TeamService.js'
+import { useStore } from 'vuex';
+
+const store = useStore(); // Initialize Vuex store
+
+const isLoggedIn = computed(() => {
+  return store.getters['isLoggedIn'];
+});
+
+const currentUser = computed(() => {
+  return store.getters['currentUser'];
+});
+
+console.log("isLoggedIn", isLoggedIn.value);
+console.log("currentUser", currentUser.value)
 
 const isLoadingEvents = ref(true);
 
@@ -12,7 +26,7 @@ const isLoadingEvents = ref(true);
 const events = ref([]);
 const leagues = ref([]);
 const teams = ref([]);
-const isLoggedInAsAdmin = ref(true);
+// const isLoggedInAsAdmin = ref(true);
 const showEditModal = ref(false);
 const selectedLeagues = ref([]);
 const filteredEvents = ref([]); 
@@ -30,7 +44,6 @@ const filterData = ref({
   startDate: '',
   endDate: '',
 });
-
 
 
 onMounted(async () => {
@@ -235,7 +248,7 @@ function resetFilters() {
       <p>Events Loading...</p>
     </div>
     <div v-else-if="filteredEvents.length > 0">
-      <Table :events="filteredEvents" :is-logged-in-as-admin="isLoggedInAsAdmin" @open-edit-modal="openEditModal"/>
+      <Table :events="filteredEvents" :is-logged-in-as-admin="isLoggedIn" @open-edit-modal="openEditModal"/>
     </div>
     <div v-else>
       <p>No events to display.</p>
