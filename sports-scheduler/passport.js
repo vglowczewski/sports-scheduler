@@ -9,9 +9,6 @@ passport.use(new LocalStrategy(
   async (email, password, done) => {
     try {
       console.log('Authenticating user:', email); // Log the email being authenticated
-      console.log('DB hashed password:', user.password);
-      console.log('bcrypt comparison result:', await bcrypt.compare(password, user.password));
-
       const user = await User.findOne({ email });
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
