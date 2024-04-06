@@ -12,6 +12,21 @@
       </select>
       <button type="submit">Add League</button>
     </form>
+    <div>
+    <h2>Filter Leagues</h2>
+    <select id="season" v-model="filterData.season">
+        <option value="Fall">Fall</option>
+        <option value="Winter">Winter</option>
+        <option value="Spring">Spring</option>
+      </select>
+    </div>
+    <!-- Filter button -->
+    <div>
+      <button @click="handleFilterClick">Filter</button>
+    </div>
+    <div>
+      <button @click="resetFilters">Reset Filters</button>
+    </div>
     <div v-if="leagues.length">
       <h2>Current Leagues</h2>
       <table>
@@ -23,13 +38,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="league in leagues" :key="league._id">
-            <td>{{ league.name }}</td>
-            <td>{{ league.season }}</td>
+          <tr v-for="filteredLeague in filteredLeagues" :key="filteredLeague._id">
+            <td>{{ filteredLeague.name }}</td>
+            <td>{{ filteredLeague.season }}</td>
             <td>
-              <button @click="editLeague(league._id)">Edit</button>
-              <button @click="deleteLeague(league._id)">Delete</button>
-              <button @click="manageTeams(league._id)">Manage Teams</button>
+              <button @click="editLeague(filteredLeague._id)">Edit</button>
+              <button @click="deleteLeague(filteredLeague._id)">Delete</button>
+              <button @click="manageTeams(filteredLeague._id)">Manage Teams</button>
             </td>
           </tr>
         </tbody>
@@ -98,14 +113,37 @@ const editFormData = ref({
   name: '',
   season: ''
 });
+const filterData = ref({
+  season: ''
+})
 const leagues = ref([]);
 const teams = ref([]);
+const filteredLeagues = ref([]);
 // const availableTeams = ref([]);
 const showTeamsModal = ref(false);
 const showEditModal = ref(false);
 const selectedLeagueId = ref('');
 // const currentLeague = ref('');
 const newTeamName = ref('');
+
+const handleFilterClick = () => {
+  filterLeagues();
+}
+
+const filterLeagues = () => {
+  if(!filterData.value.season){
+    filteredLeagues.value = leagues.value;
+    return; 
+  }
+  const selectedSeason = filterData.value.season;
+  filteredLeagues.value = leagues.value.filter(league => league.season === selectedSeason);
+}
+
+//reset the filters 
+function resetFilters() {
+  filterData.value.season = '';
+  filterLeagues();
+}
 
 const addLeague = async () => {
   if (formData.value.name.trim() !== '' && formData.value.season.trim() !== '') {
@@ -287,6 +325,7 @@ onMounted(async () => {
     const leagueData = await LeagueService.getLeagues();
     console.log("League data:", leagueData); // Log the league data
     leagues.value = leagueData;
+    filteredLeagues.value = leagues.value;
     console.log("Leagues fetched:", leagues.value);
   } catch (error) {
     console.error("Failed to fetch leagues:", error);

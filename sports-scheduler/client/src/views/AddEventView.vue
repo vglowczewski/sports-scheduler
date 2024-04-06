@@ -85,10 +85,23 @@
 
     const submitForm = async () => {
       const endpointUrl = 'https://mevn-0spf.onrender.com/events';
+      if (formData.value.type === 'tournament' || formData.value.type === 'practice') {
+        formData.value.opponent = null;
+      }
       
       try {
         const response = await axios.post(endpointUrl, formData.value);
         console.log('Data posted successfully:', response.data);
+        // Clear the form data after successful submission
+        formData.value = {
+          type: '',
+          startDate: '',
+          endDate: '',
+          location: '',
+          opponent: '',
+          league: '',
+          notes: '',
+        };
       } catch (error) {
         console.error('Error posting data:', error);
       }
