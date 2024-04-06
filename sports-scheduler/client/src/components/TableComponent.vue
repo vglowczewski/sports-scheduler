@@ -12,10 +12,11 @@
             <th>Opponent</th>
             <th>Notes</th>
             <th v-if="isLoggedInAsAdmin">Actions</th>
+            <th>Details</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="event in events" :key="event._id">
+          <tr v-for="event in events" :key="event._id" @mouseover="event.hovered = true" @mouseleave="event.hovered = false">
             <td >{{ event.league ? event.league.name : 'Unknown' }}</td>
             <td>{{ event.type }}</td>
             <td>{{ formatDate(event.startDate) }}</td>
@@ -28,15 +29,18 @@
               <button @click="editEvent(event._id)">Edit</button>
               <button @click="deleteEvent(event._id)">Delete</button>
             </td>
+            <td v-if="event.hovered" class="details-column">
+              <button @click="goToDetails(event._id)" class="details-button">Details</button>
+            </td>
           </tr>
         </tbody>
       </table>
-      
     </div>
   </template>
   
   <script setup>
-import { defineProps, defineEmits, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { ref, defineProps, defineEmits, computed } from 'vue';
 import EventService from '@/services/EventService.js';
 
 const props = defineProps({
@@ -44,7 +48,15 @@ const props = defineProps({
   isLoggedInAsAdmin: Boolean
 });
 
+const hoveredEventId = ref(null);
+const router = useRouter();
+
+
 const emit = defineEmits(['open-edit-modal']);
+
+function goToDetails(eventId) {
+  router.push({ path: `/event/${eventId}` }); // Use your actual route name and parameters
+}
 
 // Use a computed property to derive filteredEvents from props.events
 const filteredEvents = computed(() => props.events);
@@ -78,24 +90,38 @@ const filteredEvents = computed(() => props.events);
   </script>
   
   <style scoped>
-  /* Add your table styles here */
-  .table-container {
-    overflow-x: auto;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    text-align: left;
-    padding: 8px;
-  }
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  .actions-column button {
-    display: inline-block;
-    margin-right: 5px;
-  }
+.table-container {
+  position: relative; /* Ensure proper positioning of the button */
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+/* Hover effect for rows */
+tr:hover {
+  background-color: #e0e0e0; /* Darker shade for hover */
+}
+
+.actions-column button, .details-column button {
+  display: inline-block;
+  margin-right: 5px;
+  cursor: pointer;
+  background-color: #007BFF; /* Button background color */
+  color: white; /* Button text color */
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.actions-column button:hover, .details-column button:hover {
+  background-color: #0056b3; /* Darker shade for button hover */
+}
   </style>

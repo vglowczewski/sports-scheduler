@@ -18,10 +18,10 @@ router.get('/', async (req, res) => {
                 endDate: {
                     $lte: new Date(endDate)
                 }
-            }).populate('league').populate('opponent');
+            }).populate('league').populate('opponent').sort({startDate: 'asc'});
         }
         else {
-            events = await Event.find({}).populate('league').populate('opponent'); //populate league field and opponent
+            events = await Event.find({}).populate('league').populate('opponent').sort({startDate: 'asc'}); //populate league field and opponent
         }
         console.log(events);
         res.json(events);
