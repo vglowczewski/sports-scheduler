@@ -15,6 +15,7 @@ import apiClient from '@/utils/apiClient';
       try {
         const response = await apiClient.post('/leagues/', leagueData);
         console.log("recieved by leagueservice", leagueData);
+        console.log("response data", response.data)
         return response.data; 
       } catch (error) {
         console.error('Failed to add league:', error);

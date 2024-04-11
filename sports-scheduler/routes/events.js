@@ -47,7 +47,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new event
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const event = new Event(req.body);
         await event.save();

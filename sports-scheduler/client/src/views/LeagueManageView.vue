@@ -3,7 +3,7 @@
     <section class="hero is-success">
       <div class="hero-body">
         <div class="container has-text-centered">
-          <h1 class="title">Manage League</h1>
+          <h1 class="title">Manage Leagues</h1>
         </div>
       </div>
   </section>
@@ -201,6 +201,7 @@
               <button class="button is-success" type="submit">Update League</button>
             </div>
           </form>
+
         </div>
       </div>
     </section>
@@ -270,6 +271,7 @@ function resetFilters() {
 }
 
 const addLeague = async () => {
+  console.log("adding league")
   if (formData.value.name.trim() !== '' && formData.value.season.trim() !== '') {
     try {
       const leagueData = {
