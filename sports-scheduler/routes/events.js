@@ -74,7 +74,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Update an event
-router.put('/:eventId', authenticateToken, async (req, res) => {
+router.put('/:eventId', async (req, res) => {
     const eventId = req.params.eventId;
     try {
         const updatedEvent = await Event.findByIdAndUpdate(eventId, req.body, { new: true });

@@ -6,7 +6,7 @@ const Event = require('../models/Event');
 const authenticateToken = require('../authenticateToken');
 
 // Route to add a new team to a league
-router.post('/:leagueId', authenticateToken, async (req, res) => {
+router.post('/:leagueId', async (req, res) => {
     try {
       const leagueId = req.params.leagueId;
       const { name } = req.body;
@@ -23,7 +23,7 @@ router.post('/:leagueId', authenticateToken, async (req, res) => {
   });
 
 // Route to add a new team without giving it with a league
-router.post('/',authenticateToken, async (req, res) => {
+router.post('/', async (req, res) => {
   try {
       const { name } = req.body;
       const newTeam = new Team({ name });
@@ -62,7 +62,7 @@ router.post('/',authenticateToken, async (req, res) => {
   })
 
   // Update a team
-router.put('/:teamId',authenticateToken, async (req, res) => {
+router.put('/:teamId',  async (req, res) => {
   const teamId = req.params.teamId;
   try {
       const updatedTeam = await Team.findByIdAndUpdate(teamId, req.body, { new: true });
