@@ -4,6 +4,7 @@ const router = express.Router();
 const League = require('../models/League');
 const Event = require('../models/Event');
 const Team = require('../models/Team');
+const authenticateToken = require('../authenticateToken');
 
 // GET all leagues
 router.get('/', async (req, res) => {
@@ -89,7 +90,7 @@ router.get('/:leagueId/teams', async (req, res) => {
 });
 
 // Create a new league
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const league = new League(req.body);
         await league.save();
@@ -116,7 +117,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Update a league
-router.put('/:leagueId', async (req, res) => {
+router.put('/:leagueId', authenticateToken, async (req, res) => {
     const leagueId = req.params.leagueId;
     try {
         const updatedLeague = await League.findByIdAndUpdate(leagueId, req.body, { new: true });

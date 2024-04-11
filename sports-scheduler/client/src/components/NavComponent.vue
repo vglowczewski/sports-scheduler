@@ -1,17 +1,13 @@
 <!-- NavComponent.vue -->
 <template>
     <nav>
-      <RouterLink to="/">Home</RouterLink> |
-      <RouterLink to="/about">About</RouterLink> |
-      <RouterLink to="/events">Events</RouterLink>
-      <span v-if="isLoggedIn"> | </span>
-      <RouterLink to="/addEvent" v-if="isLoggedIn">Add Event</RouterLink>
-      <span v-if="isLoggedIn"> | </span>
-      <RouterLink to="/manageLeague" v-if="isLoggedIn">Manage Leagues</RouterLink>
-      <span v-if="isLoggedIn"> | </span>
-      <button v-if="isLoggedIn" @click="logout">Logout</button>
-      <span v-if="!isLoggedIn"> | </span>
-      <RouterLink v-if="!isLoggedIn" to="/login">Login</RouterLink>
+        <!-- <Navigation /> -->
+        <RouterLink to="/">Home</RouterLink> |
+        <RouterLink to="/events">Events</RouterLink> |
+        <RouterLink to="/addEvent" v-if="isLoggedIn">Add Event</RouterLink> <span v-if="isLoggedIn"> | </span>
+        <RouterLink to="/manageLeague" v-if="isLoggedIn">Manage Leagues</RouterLink> <span v-if="!isLoggedIn"> | </span>
+        <RouterLink v-if="!isLoggedIn" to="/login">Login</RouterLink>
+        <button v-if="isLoggedIn" @click="logout">Logout</button>
     </nav>
   </template>
   
@@ -23,7 +19,8 @@
   const router = useRouter();
   const store = useStore();
   
-  const isLoggedIn = store.getters['isLoggedIn'];
+  // Use computed to create a reactive isLoggedIn property
+  const isLoggedIn = computed(() => store.getters.isLoggedIn);
   console.log("isloggedIn", isLoggedIn)
   
   const logout = async () => {

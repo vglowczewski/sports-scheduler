@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
+const authenticateToken = require('../authenticateToken');
 
 // GET all events
 router.get('/', async (req, res) => {
@@ -46,7 +47,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new event
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const event = new Event(req.body);
         await event.save();
@@ -73,7 +74,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Update an event
-router.put('/:eventId', async (req, res) => {
+router.put('/:eventId', authenticateToken, async (req, res) => {
     const eventId = req.params.eventId;
     try {
         const updatedEvent = await Event.findByIdAndUpdate(eventId, req.body, { new: true });

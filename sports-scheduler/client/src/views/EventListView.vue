@@ -167,7 +167,10 @@ async function openEditModal(eventId) {
       };
 
       editFormData.value.league = eventData.league._id;
+
+      console.log("opponent id", eventData.opponent._id)
       editFormData.value.opponent = eventData.opponent._id
+
 
       // Fetch leagues and teams data
       await fetchLeagues();
@@ -201,6 +204,7 @@ const submitForm = async () => {
     // Refresh events
     const updatedEvents = await EventService.getEvents();
     events.value.splice(0, events.value.length, ...updatedEvents); // Clear and replace with new data
+    filterEvents()
     alert('Event updated successfully');
     closeEditModal();
   } catch (error) {
@@ -217,111 +221,199 @@ function resetFilters() {
   filterEvents();
 }
 
+const handleDeleteEvent = (eventId) => {
+  // Find the index of the deleted event in the events array
+  const index = events.value.findIndex(event => event._id === eventId);
+  if (index !== -1) {
+    // Remove the deleted event from the events array
+    events.value.splice(index, 1);
+  }
+};
+
 </script>
 
 <template>
+      <!-- Hero Section -->
+    <section class="hero is-success">
+      <div class="hero-body">
+        <div class="container has-text-centered">
+          <h1 class="title">Events List</h1>
+        </div>
+      </div>
+  </section>
+  <div class="container">
     <div>
-    <h1>Events List</h1>
-    <div>
-      <label for="startDate">Start Date:</label>
-      <input type="datetime-local" id="startDate" v-model="filterData.startDate" required>
-    </div>
-    <div>
-      <label for="endDate">End Date:</label>
-      <input type="datetime-local" id="endDate" v-model="filterData.endDate" required>
-    </div>
-    <!-- League picklist -->
-    <div>
-      <label for="league">Select League(s):</label>
-      <select id="league" v-model="selectedLeagues" multiple @change="fetchOpponents">
-        <option v-for="league in leagues" :key="league._id" :value="league._id">{{ league.name }}</option>
-      </select>
-    </div>
-    <!-- Filter button -->
-    <div>
-      <button @click="handleFilterClick">Filter</button>
-    </div>
-    <div>
-      <button @click="resetFilters">Reset Filters</button>
-    </div>
-    <div v-if="isLoadingEvents">
-      <p>Events Loading...</p>
-    </div>
-    <div v-else-if="filteredEvents.length > 0">
-      <Table :events="filteredEvents" :is-logged-in-as-admin="isLoggedIn" @open-edit-modal="openEditModal"/>
-    </div>
-    <div v-else>
-      <p>No events to display.</p>
-    </div>
-        <!-- Modal -->
-        <div class="modal" v-if="showEditModal">
-      <div class="modal-content">
-        <span class="close" @click="closeEditModal">&times;</span>
-        <h2>Edit Event</h2>
-      <form @submit.prevent="submitForm">
-        <label for="type">Type:</label>
-        <select id="type" v-model="editFormData.type" required>
-            <option value="practice">Practice</option>
-            <option value="game">Game</option>
-            <option value="tournament">Tournament</option>
-        </select>
-        <label for="startDate">Start Date</label>
-        <input type="datetime-local" id="startDate" v-model="editFormData.startDate" required>
-        <label for="endDate">End Date</label>
-        <input type="datetime-local" id="endDate" v-model="editFormData.endDate" required>
-        <label for="location">Location</label>
-        <input type="text" id="location" v-model="editFormData.location" required>
-        <label for="league">League</label>
-        <select id="league" v-model="editFormData.league" @change="fetchOpponents" required>
-            <option value="">Select a League</option>
-            <option v-for="league in leagues" :key="league._id" :value="league._id">{{ league.name }}</option>
-        </select>
-        <label for="opponent" v-if="editFormData.type !== 'tournament' && editFormData.type !== 'practice'">Opponent</label>
-      <select id="opponent" v-model="editFormData.opponent" v-if="editFormData.type !== 'tournament' && editFormData.type !== 'practice'">
-          <option value="">Select an Opponent</option>
-          <option v-for="opponent in filteredOpponents" :key="opponent._id" :value="opponent._id">{{ opponent.name }}</option>
-      </select>
-        <label for="notes">Notes</label>
-        <input type="text" id="notes" v-model="editFormData.notes">
-        <button type="submit">Update Event</button>
-      </form>
+      <!-- Loading Indicator -->
+      <div v-if="isLoadingEvents" class="notification">
+        Events Loading...
+      </div>
+      <!-- Filtering Fields -->
+      <section class="section">
+        <div class="columns is-centered">
+          <!-- Date Inputs and Picklist -->
+          <div class="column is-half">
+            <div class="field is-horizontal">
+              <!-- Start Date -->
+              <div class="field-body">
+                <div class="field is-narrow">
+                  <label class="label" for="startDate">Start Date:</label>
+                  <div class="control">
+                    <input class="input" type="datetime-local" id="startDate" v-model="filterData.startDate" required>
+                  </div>
+                </div>
+                <!-- End Date -->
+                <div class="field is-narrow">
+                  <label class="label" for="endDate">End Date:</label>
+                  <div class="control">
+                    <input class="input" type="datetime-local" id="endDate" v-model="filterData.endDate" required>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- League picklist -->
+            <div class="field">
+              <label class="label" for="league">Select League(s):</label>
+              <div class="control">
+                <div class="select is-multiple">
+                  <select class="input" id="league" v-model="selectedLeagues" multiple @change="fetchOpponents">
+                    <option v-for="league in leagues" :key="league._id" :value="league._id">{{ league.name }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Filter and Reset Buttons -->
+
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <div class="field is-grouped is-grouped-centered">
+              <div class="control">
+                <button class="button is-success" @click="handleFilterClick">Filter</button>
+              </div>
+              <div class="control">
+                <button class="button is-success is-outlined" @click="resetFilters">Reset Filters</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      
+      <!-- Table Component -->
+      <section class="section">
+        <!-- Conditional Rendering for Events Table or No Events Message -->
+        <template v-if="filteredEvents.length > 0">
+          <Table :events="filteredEvents" :is-logged-in-as-admin="isLoggedIn" @open-edit-modal="openEditModal" @delete-event="handleDeleteEvent"/>
+        </template>
+        <template v-else>
+          <p class>No events to display.</p>
+        </template>
+      </section>
+      
+      <!-- Edit Modal -->
+      <div class="modal" :class="{ 'is-active': showEditModal }">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">Edit Event</p>
+            <button class="delete is-responsive" aria-label="close" @click="closeEditModal"></button>
+          </header>
+          <section class="modal-card-body">
+            <!-- Form -->
+            <form @submit.prevent="submitForm">
+              <!-- Type -->
+              <div class="field">
+                <label class="label" for="type">Type:</label>
+                <div class="control">
+                  <div class="select">
+                    <select id="type" v-model="editFormData.type" required>
+                      <option value="practice">Practice</option>
+                      <option value="game">Game</option>
+                      <option value="tournament">Tournament</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <!-- Start Date -->
+              <div class="field">
+                <label class="label" for="startDate">Start Date:</label>
+                <div class="control">
+                  <input class="input" type="datetime-local" id="startDate" v-model="editFormData.startDate" required>
+                </div>
+              </div>
+              <!-- End Date -->
+              <div class="field">
+                <label class="label" for="endDate">End Date:</label>
+                <div class="control">
+                  <input class="input" type="datetime-local" id="endDate" v-model="editFormData.endDate" required>
+                </div>
+              </div>
+              <!-- Location -->
+              <div class="field">
+                <label class="label" for="location">Location:</label>
+                <div class="control">
+                  <input class="input" type="text" id="location" v-model="editFormData.location" required>
+                </div>
+              </div>
+              <!-- League -->
+              <div class="field">
+                <label class="label" for="league">League:</label>
+                <div class="control">
+                  <div class="select">
+                    <select id="league" v-model="editFormData.league" @change="fetchOpponents" required>
+                      <option value="">Select a League</option>
+                      <option v-for="league in leagues" :key="league._id" :value="league._id">{{ league.name }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <!-- Opponent (if applicable) -->
+              <div class="field" v-if="editFormData.type !== 'tournament' && editFormData.type !== 'practice'">
+                <label class="label" for="opponent">Opponent:</label>
+                <div class="control">
+                  <div class="select">
+                    <select id="opponent" v-model="editFormData.opponent">
+                      <option value="">Select an Opponent</option>
+                      <option v-for="opponent in filteredOpponents" :key="opponent._id" :value="opponent._id">{{ opponent.name }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <!-- Submit Button -->
+              <div class="field">
+                <div class="control">
+                  <button class="button is-success" type="submit">Update Event</button>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
       </div>
     </div>
-    <!-- <EditModal :show="showEditModal" :eventId="selectedEventId" @close="closeEditModal"/> -->
+    
+      <!-- Social Links -->
+      <footer class="footer">
+    <div class="content has-text-centered">
+      <p class="social-icons">
+        <a href="#"><span style="color: #48C774;"><i class="fab fa-facebook fa-lg"></i></span></a>
+      <a href="#"><span style="color: #48C774;"><i class="fab fa-twitter fa-lg"></i></span></a>
+      <a href="#"><span style="color:#48C774;"><i class="fab fa-instagram fa-lg"></i></span></a>
+      <a href="#"><span style="color: #48C774;"><i class="fab fa-youtube fa-lg"></i></span></a>
+      </p>
+      <p>
+        <strong>Bayview Glen Independent School</strong> &copy; 2024. All rights reserved.
+      </p>
+    </div>
+  </footer>
   </div>
 </template>
+
+
  
 <style scoped>
-.modal {
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
+  .social-icons a {
+  margin-right: 1.0rem; /* Adjust the margin to add more space between icons */
 }
 </style>

@@ -1,13 +1,5 @@
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';
 
-const apiClient = axios.create({
-    baseURL: 'https://mevn-0spf.onrender.com',
-    withCredentials: false,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    }
-  })
    
   export default {
     async getEvents() {
@@ -46,5 +38,14 @@ const apiClient = axios.create({
         throw error; // Rethrow the error to handle it in the calling context
       }
     }, 
+    async createEvent(formData) {
+      try {
+        console.log("form data", formData)
+        const response = await apiClient.post('/events/', formData);
+        return response.data;
+      } catch (error) {
+        throw new Error('Error creating event: ' + error.response.data.message);
+      }
+    },
   }
   

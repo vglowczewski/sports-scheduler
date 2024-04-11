@@ -1,6 +1,6 @@
 <template>
   <div class="map-container">
-    <h1>Event Location</h1>
+    <h1 class="title is-4">Event Location</h1>
     <div id="googleMap"></div>
   </div>
 </template>

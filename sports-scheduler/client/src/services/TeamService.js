@@ -1,13 +1,4 @@
-import axios from 'axios';
-
-const apiClient = axios.create({
-    baseURL: 'https://mevn-0spf.onrender.com',
-    withCredentials: false,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    }
-  })
+import apiClient from '@/utils/apiClient';
    
   export default {
     async getTeamsByLeague(leagueId) {

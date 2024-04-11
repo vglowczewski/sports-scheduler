@@ -1,102 +1,226 @@
 <template>
-  <div>
-    <h1>Add League</h1>
-    <form @submit.prevent="addLeague">
-      <label for="leagueName">League Name:</label>
-      <input type="text" id="leagueName" v-model="formData.name" required>
-      <label for="season">Season:</label>
-      <select id="season" v-model="formData.season" required>
-        <option value="Fall">Fall</option>
-        <option value="Winter">Winter</option>
-        <option value="Spring">Spring</option>
-      </select>
-      <button type="submit">Add League</button>
-    </form>
-    <div>
-    <h2>Filter Leagues</h2>
-    <select id="season" v-model="filterData.season">
-        <option value="Fall">Fall</option>
-        <option value="Winter">Winter</option>
-        <option value="Spring">Spring</option>
-      </select>
-    </div>
-    <!-- Filter button -->
-    <div>
-      <button @click="handleFilterClick">Filter</button>
-    </div>
-    <div>
-      <button @click="resetFilters">Reset Filters</button>
-    </div>
-    <div v-if="leagues.length">
-      <h2>Current Leagues</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>League Name</th>
-            <th>Season</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="filteredLeague in filteredLeagues" :key="filteredLeague._id">
-            <td>{{ filteredLeague.name }}</td>
-            <td>{{ filteredLeague.season }}</td>
-            <td>
-              <button @click="editLeague(filteredLeague._id)">Edit</button>
-              <button @click="deleteLeague(filteredLeague._id)">Delete</button>
-              <button @click="manageTeams(filteredLeague._id)">Manage Teams</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <!-- Teams Modal -->
-    <div class="modal" v-if="showTeamsModal">
-      <div class="modal-content">
-        <span class="close" @click="closeTeamsModal">&times;</span>
-        <h1>Manage Teams</h1>
-        <h2 v-if="teams.length > 0">Current Teams</h2>
-        <ul>
-         <li v-for="team in teams" :key="team._id" :value="team._id">
-            {{ team.name }}
-           <!-- button to remove team from league -->
-           <button @click="removeTeamFromLeague(team)">X</button>
-          </li>
-        </ul>
-        <!-- Add Team Form -->
-        <h2>Add Team</h2>
-        <form @submit.prevent="addTeamToLeague">
-          <label for="teamName">Team Name:</label>
-          <input type="text" id="teamName" v-model="newTeamName" required>
-          <button type="submit">Add Team</button>
-        </form>
-        <!-- <h2 v-if="availableTeams.length > 0">Available Teams</h2>
-        <ul>
-          <li v-for="availableTeam in availableTeams" :key="availableTeam._id" :value="availableTeam._id">
-            {{ availableTeam.name }}
-            <button @click="addTeamToLeague(availableTeam)">+</button>
-          </li>
-        </ul> -->
-    </div>
-  </div> 
-   <!-- Edit Modal -->
-   <div class="modal" v-if="showEditModal">
-      <div class="modal-content">
-        <span class="close" @click="closeEditModal">&times;</span>
-        <h2>Edit League</h2>
-        <form @submit.prevent="submitForm">
-        <label for="editLeagueName">League Name:</label>
-        <input type="text" id="editLeagueName" v-model="editFormData.name" required>
-        <label for="editSeason">Season:</label>
-        <select id="editSeason" v-model="editFormData.season" required>
-          <option value="Fall">Fall</option>
-          <option value="Winter">Winter</option>
-          <option value="Spring">Spring</option>
-        </select>
-        <button type="submit">Update League</button>
+    <!-- Hero Section -->
+    <section class="hero is-success">
+      <div class="hero-body">
+        <div class="container has-text-centered">
+          <h1 class="title">Manage League</h1>
+        </div>
+      </div>
+  </section>
+  <div class="container has-text-centered">
+    
+    <!-- Add League -->
+    <div class="columns is-multiline">
+      <div class="column is-half-desktop is-full-tablet">
+    <div class="section">
+      <h1 class="title is-4">Add League</h1>
+      <form @submit.prevent="addLeague" class="center-form">
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <!-- League Name -->
+            <div class="field">
+              <label class="label" for="leagueName">League Name:</label>
+              <div class="control">
+                <input class="input" type="text" id="leagueName" v-model="formData.name" required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="column is-half">
+            <!-- Season Dropdown -->
+            <div class="field">
+              <label class="label" for="season">Season:</label>
+              <div class="control">
+                <div class="select">
+                  <select id="season" v-model="formData.season" required>
+                    <option value="Fall">Fall</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Spring">Spring</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-success" type="submit">Add League</button>
+          </div>
+        </div>
+        
       </form>
+    </div>
+    </div>
+
+    <!-- Filter Fields -->
+    <div class="column is-half-desktop is-full-tablet">
+    <div class="section">
+      <h1 class="title is-4">Filter Leagues</h1>
+      <div class="field">
+        <label class="label">Season:</label>
+        <div class="control">
+          <div class="select">
+            <select id="seasonFilter" v-model="filterData.season">
+              <option value="Fall">Fall</option>
+              <option value="Winter">Winter</option>
+              <option value="Spring">Spring</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    <!-- Filter button -->
+    <div class="field is-grouped is-grouped-centered">
+      <div>
+        <button class="button is-success" @click="handleFilterClick">Filter</button>
+      </div>
+      <div>
+        <button class="button is-success is-outlined" @click="resetFilters">Reset Filters</button>
       </div>
     </div>
+  </div>
+</div>
+</div>
+
+    <!-- Current Leagues -->
+    <div class="section">
+      <div v-if="leagues.length">
+        <h2 class="title is-4">Current Leagues</h2>
+        <table class="table is-bordered is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>League Name</th>
+              <th>Season</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="filteredLeague in filteredLeagues" :key="filteredLeague._id">
+              <td>{{ filteredLeague.name }}</td>
+              <td>{{ filteredLeague.season }}</td>
+              <td>
+                <span class="icon-clickable" @click="editLeague(filteredLeague._id)">
+                <i class="fas fa-edit"></i>
+              </span>
+              <span class="icon-clickable" @click="deleteLeague(filteredLeague._id)">
+                <i class="fas fa-trash"></i>
+              </span>
+              <span class="icon-clickable" @click="manageTeams(filteredLeague._id)">
+                <i class="fas fa-users"></i>
+              </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+
+    <!-- Teams Modal -->
+<div class="modal" :class="{ 'is-active': showTeamsModal }">
+  <div class="modal-background"></div>
+  <div class="modal-card"> 
+    <header class="modal-card-head">
+      <p class="modal-card-title title is-3">Manage Teams</p>
+      <button class="delete is-responsive" aria-label="close" @click="closeTeamsModal"></button>
+    </header>
+    <section class="modal-card-body"> 
+      <div class="columns is-centered"> <!-- Centered columns -->
+        <div class="column is-half">
+          <h2 class="title is-5" v-if="teams.length > 0">Current Teams</h2>
+          <ul class="content">
+            <li v-for="team in teams" :key="team._id" :value="team._id">
+              {{ team.name }}
+              <!-- button to remove team from league -->
+              <span @click="removeTeamFromLeague(team)">
+                <i class="fas fa-trash"></i>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- Add Team Form -->
+      <div class="columns is-centered"> <!-- Centered columns -->
+        <div class="column is-half">
+          <h2 class="title is-5">Add Team</h2>
+          <form @submit.prevent="addTeamToLeague">
+            <div class="field">
+              <label class="label" for="teamName">Team Name:</label>
+              <div class="control">
+                <input class="input" type="text" id="teamName" v-model="newTeamName" required>
+              </div>
+            </div>
+            <div class="control">
+              <button class="button is-success" type="submit">Add Team</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+        
+ <!-- Edit Modal -->
+<div class="modal" :class="{ 'is-active': showEditModal }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Edit Event</p>
+      <button class="delete is-responsive" aria-label="close" @click="closeEditModal"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="columns is-centered"> <!-- Centered columns -->
+        <div class="column is-half">
+          <!-- Form -->
+          <form @submit.prevent="submitForm">
+            <!--League Name field-->
+            <div class="field">
+              <label class="label" for="editLeagueName">League Name:</label>
+              <div class="control">
+                <input class="input" type="text" id="editLeagueName" v-model="editFormData.name" required>
+              </div>
+            </div>
+            <!--Season field-->
+            <div class="field">
+              <label class="label" for="editSeason">Season:</label>
+              <div class="control">
+                <div class="select">
+                  <select id="editSeason" v-model="editFormData.season" required>
+                    <option value="Fall">Fall</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Spring">Spring</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <!--Button-->
+            <div class="field">
+              <button class="button is-success" type="submit">Update League</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+    
+      <!-- Social Links -->
+      <footer class="footer">
+    <div class="content has-text-centered">
+      <p class="social-icons">
+        <a href="#"><span style="color: #48C774;"><i class="fab fa-facebook fa-lg"></i></span></a>
+      <a href="#"><span style="color: #48C774;"><i class="fab fa-twitter fa-lg"></i></span></a>
+      <a href="#"><span style="color:#48C774;"><i class="fab fa-instagram fa-lg"></i></span></a>
+      <a href="#"><span style="color: #48C774;"><i class="fab fa-youtube fa-lg"></i></span></a>
+      </p>
+      <p>
+        <strong>Bayview Glen Independent School</strong> &copy; 2024. All rights reserved.
+      </p>
+    </div>
+  </footer>
 </div>
 </template>
 
@@ -190,6 +314,7 @@ const deleteLeague = async (leagueId) => {
       
       // Remove the league from the leagues array because now deleted
       leagues.value = leagues.value.filter(league => league._id !== leagueId);
+      filterLeagues() //need tihs for table to update
       console.log("League deleted successfully.");
     }
   } catch (error) {
@@ -311,6 +436,8 @@ async function submitForm() {
     console.log("selectedLeagueId", selectedLeagueId.value)
     await LeagueService.updateLeague(selectedLeagueId.value, editFormData.value);
     await fetchLeagues();
+    // Update filteredLeagues as well to update table
+      filterLeagues()
     alert('League updated successfully');
     closeEditModal();
   } catch (error) {
@@ -338,17 +465,6 @@ onMounted(async () => {
 .table-container {
   overflow-x: auto;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-th, td {
-  text-align: left;
-  padding: 8px;
-}
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
 
 .modal {
   position: fixed;
@@ -369,17 +485,25 @@ tr:nth-child(even) {
   width: 80%;
 }
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
+.center-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  /* Reduce gap between fields */
+  .field:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+
+  .icon-clickable {
+    margin-right: 0.8rem; /* Adjust the margin to add space between icons */
+    cursor: pointer;
+  }
+
+  .social-icons a {
+  margin-right: 1.0rem; /* Adjust the margin to add more space between icons */
 }
 
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
   </style>
